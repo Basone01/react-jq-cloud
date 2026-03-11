@@ -3,6 +3,9 @@ import { computeLayout } from './layout';
 import type { WordPosition } from './layout';
 import type { Word, WordCloudProps } from './types';
 
+const SHRINK_STEP = 0.85;
+const SHRINK_MIN_SCALE = 0.3;
+
 export function WordCloud({
   words,
   width,
@@ -10,6 +13,7 @@ export function WordCloud({
   center,
   shape = 'elliptic',
   removeOverflowing = true,
+  shrinkToFit = false,
   fontSizes = [12, 60],
   fontFamily,
   colors,
@@ -21,6 +25,8 @@ export function WordCloud({
   afterCloudRender,
 }: WordCloudProps) {
   const [positions, setPositions] = useState<(WordPosition | null)[] | null>(null);
+  // Effective font sizes after shrink-to-fit scaling (may differ from prop)
+  const [activeFontSizes, setActiveFontSizes] = useState<[number, number]>(fontSizes);
   // How many words have been revealed so far (for wordDelay animation)
   const [revealedCount, setRevealedCount] = useState(0);
   const spanRefs = useRef<(HTMLSpanElement | null)[]>([]);
@@ -32,8 +38,9 @@ export function WordCloud({
   const maxWeight = Math.max(...weights, 1);
   const weightRange = maxWeight - minWeight || 1;
 
+  // Pass-1 uses activeFontSizes so the invisible spans are sized for measurement
   function getFontSize(weight: number): number {
-    return fontSizes[0] + ((weight - minWeight) / weightRange) * (fontSizes[1] - fontSizes[0]);
+    return activeFontSizes[0] + ((weight - minWeight) / weightRange) * (activeFontSizes[1] - activeFontSizes[0]);
   }
 
   // Reveal order: original indices of placed words, sorted by weight desc (= layout order).
@@ -57,8 +64,9 @@ export function WordCloud({
   // Reset on key prop changes
   useEffect(() => {
     setPositions(null);
+    setActiveFontSizes(fontSizes);
     setRevealedCount(0);
-  }, [words, width, height, shape, fontSizes[0], fontSizes[1]]);
+  }, [words, width, height, shape, shrinkToFit, fontSizes[0], fontSizes[1]]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Pass 1: measure spans → compute layout
   useEffect(() => {
@@ -69,20 +77,37 @@ export function WordCloud({
     }
 
     const frame = requestAnimationFrame(() => {
-      const rects = spanRefs.current.slice(0, words.length).map(el => {
+      const baseRects = spanRefs.current.slice(0, words.length).map(el => {
         if (!el) return { width: 0, height: 0 };
         const r = el.getBoundingClientRect();
         return { width: r.width, height: r.height };
       });
 
-      const computed = computeLayout(words, rects, {
-        width,
-        height,
-        center: resolvedCenter,
-        shape,
-        removeOverflowing,
-        fontSizes,
+      // When shrinkToFit is on, iteratively reduce font scale until all words
+      // fit within the container (no null positions from removeOverflowing).
+      // Rects scale proportionally with font size so no re-measurement needed.
+      let scale = 1.0;
+      let currentFontSizes: [number, number] = fontSizes;
+      let rects = baseRects;
+      let computed = computeLayout(words, rects, {
+        width, height, center: resolvedCenter, shape,
+        removeOverflowing: shrinkToFit ? true : removeOverflowing,
+        fontSizes: currentFontSizes,
       });
+
+      if (shrinkToFit) {
+        while (scale > SHRINK_MIN_SCALE && computed.some(p => p === null)) {
+          scale *= SHRINK_STEP;
+          currentFontSizes = [fontSizes[0] * scale, fontSizes[1] * scale];
+          rects = baseRects.map(r => ({ width: r.width * scale, height: r.height * scale }));
+          computed = computeLayout(words, rects, {
+            width, height, center: resolvedCenter, shape,
+            removeOverflowing: true,
+            fontSizes: currentFontSizes,
+          });
+        }
+        setActiveFontSizes(currentFontSizes);
+      }
 
       setPositions(computed);
     });

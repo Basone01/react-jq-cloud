@@ -371,7 +371,81 @@ function WordDelayDemo() {
   );
 }
 
-type DemoKey = 'basic' | 'links' | 'long' | 'fifty' | 'delay' | 'word-delay';
+// --- Demo 7: shrinkToFit ---
+type FitMode = 'removeOverflowing' | 'allowOverflow' | 'shrinkToFit';
+
+function ShrinkToFitDemo() {
+  const [mode, setMode] = useState<FitMode>('removeOverflowing');
+  const [cloudKey, setCloudKey] = useState(0);
+
+  function setModeAndReset(m: FitMode) {
+    setMode(m);
+    setCloudKey(k => k + 1);
+  }
+
+  const modes: { key: FitMode; label: string; description: string }[] = [
+    {
+      key: 'removeOverflowing',
+      label: 'removeOverflowing',
+      description: 'Words that don\'t fit are dropped (default)',
+    },
+    {
+      key: 'allowOverflow',
+      label: 'removeOverflowing=false',
+      description: 'All words placed; may extend outside container',
+    },
+    {
+      key: 'shrinkToFit',
+      label: 'shrinkToFit',
+      description: 'Font scale reduced until every word fits inside bounds',
+    },
+  ];
+
+  const props = {
+    removeOverflowing: mode === 'removeOverflowing',
+    shrinkToFit: mode === 'shrinkToFit',
+  };
+
+  return (
+    <div>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
+        {modes.map(m => (
+          <button
+            key={m.key}
+            onClick={() => setModeAndReset(m.key)}
+            style={{
+              padding: '6px 14px', borderRadius: 6,
+              border: '1px solid #ccc',
+              background: mode === m.key ? '#0070f3' : '#fff',
+              color: mode === m.key ? '#fff' : '#333',
+              cursor: 'pointer',
+              fontWeight: mode === m.key ? 600 : 400,
+            }}
+          >
+            {m.label}
+          </button>
+        ))}
+      </div>
+      <p style={{ margin: '0 0 12px', color: '#555', fontSize: 13 }}>
+        {modes.find(m => m.key === mode)!.description}
+      </p>
+      <WordCloud
+        key={cloudKey}
+        words={fiftyWords}
+        width={740}
+        height={460}
+        {...props}
+        style={{ border: '1px solid #ddd', borderRadius: 8, background: '#fafafa' }}
+      />
+      <p style={{ marginTop: 8, fontSize: 12, color: '#888' }}>
+        50 words. With <code>shrinkToFit</code>, font sizes are scaled down (up to ×0.30 min)
+        until all words fit without any being dropped.
+      </p>
+    </div>
+  );
+}
+
+type DemoKey = 'basic' | 'links' | 'long' | 'fifty' | 'delay' | 'word-delay' | 'shrink';
 
 const DEMOS: { key: DemoKey; label: string; words: Word[]; description: string }[] = [
   { key: 'basic', label: 'Basic', words: basicWords, description: '20 words — shape toggle' },
@@ -380,12 +454,14 @@ const DEMOS: { key: DemoKey; label: string; words: Word[]; description: string }
   { key: 'fifty', label: '50 Keywords', words: fiftyWords, description: '50 tech keywords across frameworks, languages, databases, and tools' },
   { key: 'delay', label: 'Async fetch', words: [], description: 'Simulates async data loading: spinner while fetching, then afterCloudRender triggers a fade-in.' },
   { key: 'word-delay', label: 'Word delay', words: [], description: 'wordDelay prop: words appear one by one (heaviest first). Drag the slider to control the interval.' },
+  { key: 'shrink', label: 'Shrink to fit', words: [], description: 'Compare removeOverflowing vs allowOverflow vs shrinkToFit on 50 words.' },
 ];
 
 export default function App() {
   const [demo, setDemo] = useState<DemoKey>('basic');
   const [shape, setShape] = useState<'elliptic' | 'rectangular'>('elliptic');
   const [removeOverflowing, setRemoveOverflowing] = useState(true);
+  const [shrinkToFit, setShrinkToFit] = useState(false);
   const [clicked, setClicked] = useState<string | null>(null);
 
   const current = DEMOS.find(d => d.key === demo)!;
@@ -429,8 +505,8 @@ export default function App() {
 
       <p style={{ margin: '0 0 12px', color: '#555', fontSize: 13 }}>{current.description}</p>
 
-      {/* Controls — hidden for delay demos */}
-      {demo !== 'delay' && demo !== 'word-delay' && (
+      {/* Controls — hidden for self-contained demos */}
+      {demo !== 'delay' && demo !== 'word-delay' && demo !== 'shrink' && (
         <div style={{ display: 'flex', gap: 20, marginBottom: 16, alignItems: 'center', flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', gap: 12 }}>
             {(['elliptic', 'rectangular'] as const).map(s => (
@@ -448,7 +524,23 @@ export default function App() {
           <label style={{ cursor: 'pointer', display: 'flex', gap: 6, alignItems: 'center' }}>
             <input
               type="checkbox"
+              checked={shrinkToFit}
+              onChange={e => {
+                setShrinkToFit(e.target.checked);
+                if (e.target.checked) setRemoveOverflowing(true);
+              }}
+            />
+            Shrink to fit
+          </label>
+          <label style={{
+            cursor: shrinkToFit ? 'not-allowed' : 'pointer',
+            display: 'flex', gap: 6, alignItems: 'center',
+            opacity: shrinkToFit ? 0.4 : 1,
+          }}>
+            <input
+              type="checkbox"
               checked={removeOverflowing}
+              disabled={shrinkToFit}
               onChange={e => setRemoveOverflowing(e.target.checked)}
             />
             Remove overflowing
@@ -466,15 +558,18 @@ export default function App() {
         <DelayDemo key="delay" />
       ) : demo === 'word-delay' ? (
         <WordDelayDemo key="word-delay" />
+      ) : demo === 'shrink' ? (
+        <ShrinkToFitDemo key="shrink" />
       ) : (
         <>
           <WordCloud
-            key={demo}
+            key={`${demo}-${shape}-${removeOverflowing}-${shrinkToFit}`}
             words={current.words}
             width={740}
             height={460}
             shape={shape}
             removeOverflowing={removeOverflowing}
+            shrinkToFit={shrinkToFit}
             onWordClick={word => setClicked(word.text)}
             style={{ border: '1px solid #ddd', borderRadius: 8, background: '#fafafa' }}
           />

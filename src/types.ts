@@ -22,6 +22,7 @@ export interface WordCloudProps {
   colors?: string[];
   className?: string;
   style?: React.CSSProperties;
+  shrinkToFit?: boolean;        // reduce font scale until all words fit within bounds
   wordDelay?: number;           // ms between each word appearing (0 = all at once)
   onWordClick?: (word: Word, event: React.MouseEvent) => void;
   onWordReveal?: (revealed: number, total: number) => void;
