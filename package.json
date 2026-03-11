@@ -1,6 +1,6 @@
 {
   "name": "@basone01/react-jq-cloud",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "React word cloud component based on jQCloud layout algorithm",
   "keywords": [
     "react",
@@ -30,6 +30,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "example": "vite example",
+    "build:example": "vite build example --outDir ../dist-example --emptyOutDir",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "npm run build"
   },

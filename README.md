@@ -1,4 +1,4 @@
-# react-jq-cloud
+# @basone01/react-jq-cloud
 
 A React + TypeScript word cloud component based on the layout algorithm from [jQCloud](https://github.com/lucaong/jQCloud).
 
@@ -31,7 +31,7 @@ Words are placed on a spiral (elliptic or rectangular) starting from the center 
 ## Installation
 
 ```bash
-npm install react-jq-cloud
+npm install @basone01/react-jq-cloud
 ```
 
 Peer dependencies (`react` and `react-dom` ≥ 17) must already be installed in your project.
@@ -41,8 +41,8 @@ Peer dependencies (`react` and `react-dom` ≥ 17) must already be installed in 
 ## Quick start
 
 ```tsx
-import { WordCloud } from 'react-jq-cloud';
-import 'react-jq-cloud/styles.css';
+import { WordCloud } from '@basone01/react-jq-cloud';
+import '@basone01/react-jq-cloud/styles.css';
 
 const words = [
   { text: 'React',      weight: 10 },
@@ -102,7 +102,7 @@ interface Word {
 
 ### CSS weight classes
 
-When you import `react-jq-cloud/styles.css` each word receives a class `w1`–`w10` (1 = lightest, 10 = heaviest). You can override these classes in your own stylesheet:
+When you import `@basone01/react-jq-cloud/styles.css` each word receives a class `w1`–`w10` (1 = lightest, 10 = heaviest). You can override these classes in your own stylesheet:
 
 ```css
 /* your-styles.css */
@@ -277,8 +277,8 @@ Contributions are welcome — bug reports, feature requests, and pull requests a
 ### Development setup
 
 ```bash
-git clone https://github.com/your-org/react-jq-cloud.git
-cd react-jq-cloud
+git clone https://github.com/basone01/react-jq-cloud.git
+cd react-jq-cloud  # or your fork
 npm install
 ```
 
