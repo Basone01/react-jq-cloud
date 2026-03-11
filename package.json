@@ -1,6 +1,6 @@
 {
   "name": "@basone01/react-jq-cloud",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "React word cloud component based on jQCloud layout algorithm",
   "keywords": [
     "react",
