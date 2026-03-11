@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { computeLayout } from './layout';
 import type { WordPosition } from './layout';
-import type { Word, WordCloudProps } from './types';
+import type { Word, ReactJQCloudProps } from './types';
 
 const SHRINK_STEP = 0.85;
 const SHRINK_MIN_SCALE = 0.3;
 
-export function WordCloud({
+export function ReactJQCloud({
   words,
   width,
   height,
@@ -23,7 +23,7 @@ export function WordCloud({
   onWordClick,
   onWordReveal,
   afterCloudRender,
-}: WordCloudProps) {
+}: ReactJQCloudProps) {
   const [positions, setPositions] = useState<(WordPosition | null)[] | null>(null);
   // Effective font sizes after shrink-to-fit scaling (may differ from prop)
   const [activeFontSizes, setActiveFontSizes] = useState<[number, number]>(fontSizes);

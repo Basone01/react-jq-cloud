@@ -1,2 +1,2 @@
-export { WordCloud } from './WordCloud';
-export type { Word, WordCloudProps } from './types';
+export { ReactJQCloud } from './ReactJQCloud';
+export type { Word, ReactJQCloudProps } from './types';

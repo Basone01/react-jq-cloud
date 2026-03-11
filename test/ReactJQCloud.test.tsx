@@ -1,7 +1,7 @@
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { WordCloud } from '../src/WordCloud';
+import { ReactJQCloud } from '../src/ReactJQCloud';
 import type { Word } from '../src/types';
 
 const words: Word[] = [
@@ -10,10 +10,10 @@ const words: Word[] = [
   { text: 'Cloud', weight: 5 },
 ];
 
-describe('WordCloud', () => {
+describe('ReactJQCloud', () => {
   it('renders container with correct width and height', () => {
     const { container } = render(
-      <WordCloud words={words} width={600} height={400} />
+      <ReactJQCloud words={words} width={600} height={400} />
     );
     const div = container.firstChild as HTMLElement;
     expect(div.style.width).toBe('600px');
@@ -21,7 +21,7 @@ describe('WordCloud', () => {
   });
 
   it('renders word text content', () => {
-    render(<WordCloud words={words} width={600} height={400} />);
+    render(<ReactJQCloud words={words} width={600} height={400} />);
     expect(screen.getByText('React')).toBeInTheDocument();
     expect(screen.getByText('TypeScript')).toBeInTheDocument();
     expect(screen.getByText('Cloud')).toBeInTheDocument();
@@ -29,7 +29,7 @@ describe('WordCloud', () => {
 
   it('applies custom className', () => {
     const { container } = render(
-      <WordCloud words={words} width={600} height={400} className="my-cloud" />
+      <ReactJQCloud words={words} width={600} height={400} className="my-cloud" />
     );
     const div = container.firstChild as HTMLElement;
     expect(div.classList.contains('react-jq-cloud')).toBe(true);
@@ -39,7 +39,7 @@ describe('WordCloud', () => {
   it('calls onWordClick when a word is clicked', () => {
     const handleClick = vi.fn();
     render(
-      <WordCloud words={words} width={600} height={400} onWordClick={handleClick} />
+      <ReactJQCloud words={words} width={600} height={400} onWordClick={handleClick} />
     );
     fireEvent.click(screen.getByText('React'));
     expect(handleClick).toHaveBeenCalledTimes(1);
@@ -50,7 +50,7 @@ describe('WordCloud', () => {
     const linkedWords: Word[] = [
       { text: 'ReactJS', weight: 10, link: 'https://react.dev' },
     ];
-    const { container } = render(<WordCloud words={linkedWords} width={600} height={400} />);
+    const { container } = render(<ReactJQCloud words={linkedWords} width={600} height={400} />);
     const link = container.querySelector('a[href="https://react.dev"]');
     expect(link).toBeInTheDocument();
     expect(link!.textContent).toBe('ReactJS');
@@ -60,7 +60,7 @@ describe('WordCloud', () => {
     const linkedWords: Word[] = [
       { text: 'Docs', weight: 8, link: { href: 'https://example.com', target: '_blank' } },
     ];
-    const { container } = render(<WordCloud words={linkedWords} width={600} height={400} />);
+    const { container } = render(<ReactJQCloud words={linkedWords} width={600} height={400} />);
     const link = container.querySelector('a[href="https://example.com"]');
     expect(link).toBeInTheDocument();
     expect(link!.getAttribute('target')).toBe('_blank');

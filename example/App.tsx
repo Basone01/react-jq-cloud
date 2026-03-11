@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { WordCloud } from '../src/WordCloud';
+import { ReactJQCloud } from '../src/ReactJQCloud';
 import '../src/styles.css';
 import type { Word } from '../src/types';
 
@@ -23,7 +23,7 @@ function CodeBlock({ code }: { code: string }) {
     // strings
     .replace(/("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`)/g,
       '<span style="color:#a8ff78">$1</span>')
-    // jsx tags  &lt;WordCloud  &lt;/WordCloud
+    // jsx tags  &lt;ReactJQCloud  &lt;/ReactJQCloud
     .replace(/(&lt;\/?[A-Z][A-Za-z]*)/g,
       '<span style="color:#79b8ff">$1</span>')
     // jsx closing >
@@ -234,7 +234,7 @@ const allDelayWords: Word[] = [
 
 const SNIPPETS: Record<string, string> = {
   basic: `\
-import { WordCloud } from '@basone01/react-jq-cloud';
+import { ReactJQCloud } from '@basone01/react-jq-cloud';
 import '@basone01/react-jq-cloud/styles.css';
 
 const words = [
@@ -244,7 +244,7 @@ const words = [
   // ...
 ];
 
-<WordCloud
+<ReactJQCloud
   words={words}
   width={740}
   height={460}
@@ -265,13 +265,13 @@ const words = [
   },
 ];
 
-<WordCloud words={words} width={740} height={460} />`,
+<ReactJQCloud words={words} width={740} height={460} />`,
 
   long: `\
 // Long words may overflow the container.
 // Toggle removeOverflowing to drop or keep them.
 
-<WordCloud
+<ReactJQCloud
   words={words}
   width={740}
   height={460}
@@ -280,7 +280,7 @@ const words = [
 
 // — or —
 
-<WordCloud
+<ReactJQCloud
   words={words}
   width={740}
   height={460}
@@ -291,7 +291,7 @@ const words = [
 // 50 words — heavier words land closest to center.
 // Font sizes are linearly mapped across [minPx, maxPx].
 
-<WordCloud
+<ReactJQCloud
   words={words}       // Word[]
   width={740}
   height={460}
@@ -307,7 +307,7 @@ function run() {
   setTimeout(() => setWords(apiData), 1500);
 }
 
-<WordCloud
+<ReactJQCloud
   words={words}
   width={740}
   height={460}
@@ -322,7 +322,7 @@ function run() {
 // Words appear one by one after layout (heaviest first).
 // onWordReveal fires on every step for progress tracking.
 
-<WordCloud
+<ReactJQCloud
   words={words}
   width={740}
   height={460}
@@ -335,10 +335,10 @@ function run() {
 
   shrink: `\
 // removeOverflowing (default) — drops words that don't fit
-<WordCloud words={words} width={740} height={460} />
+<ReactJQCloud words={words} width={740} height={460} />
 
 // removeOverflowing=false — places all words, may overflow
-<WordCloud
+<ReactJQCloud
   words={words}
   width={740}
   height={460}
@@ -346,7 +346,7 @@ function run() {
 />
 
 // shrinkToFit — scales font down until everything fits
-<WordCloud
+<ReactJQCloud
   words={words}
   width={740}
   height={460}
@@ -383,7 +383,7 @@ function DelayDemo() {
       addLog(`Received ${allDelayWords.length} words`);
       setWords(allDelayWords);
       setPhase('laying-out');
-      addLog('WordCloud measuring + layout…');
+      addLog('ReactJQCloud measuring + layout…');
     }, FETCH_DELAY_MS);
   }, []);
 
@@ -445,7 +445,7 @@ function DelayDemo() {
             position: 'absolute', inset: 0,
             opacity: visible ? 1 : 0, transition: 'opacity 600ms ease',
           }}>
-            <WordCloud words={words} width={740} height={460} afterCloudRender={onRender} />
+            <ReactJQCloud words={words} width={740} height={460} afterCloudRender={onRender} />
           </div>
         )}
       </div>
@@ -528,7 +528,7 @@ function WordDelayDemo() {
         )}
       </div>
 
-      <WordCloud
+      <ReactJQCloud
         key={cloudKey}
         words={allDelayWords}
         width={740}
@@ -582,7 +582,7 @@ function ShrinkToFitDemo() {
       <p style={{ margin: '0 0 12px', color: '#555', fontSize: 13 }}>
         {modes.find(m => m.key === mode)!.description}
       </p>
-      <WordCloud
+      <ReactJQCloud
         key={cloudKey}
         words={fiftyWords}
         width={740}
@@ -696,7 +696,7 @@ export default function App() {
         <ShrinkToFitDemo key="shrink" />
       ) : (
         <>
-          <WordCloud
+          <ReactJQCloud
             key={`${demo}-${shape}-${removeOverflowing}-${shrinkToFit}`}
             words={current.words}
             width={740}

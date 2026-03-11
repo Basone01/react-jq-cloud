@@ -9,7 +9,7 @@ export interface Word {
   handlers?: Record<string, (event: MouseEvent) => void>;
 }
 
-export interface WordCloudProps {
+export interface ReactJQCloudProps {
   words: Word[];
   width: number;
   height: number;
