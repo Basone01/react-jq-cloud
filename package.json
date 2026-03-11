@@ -1,8 +1,13 @@
 {
   "name": "react-jqcloud",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "React word cloud component based on jQCloud layout algorithm",
-  "keywords": ["react", "word-cloud", "tag-cloud", "visualization"],
+  "keywords": [
+    "react",
+    "word-cloud",
+    "tag-cloud",
+    "visualization"
+  ],
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -16,7 +21,9 @@
     },
     "./styles.css": "./dist/styles.css"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup && cp src/styles.css dist/styles.css",
     "dev": "tsup --watch",
