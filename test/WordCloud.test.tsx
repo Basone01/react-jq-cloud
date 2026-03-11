@@ -1,3 +1,4 @@
+import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { WordCloud } from '../src/WordCloud';
@@ -31,7 +32,7 @@ describe('WordCloud', () => {
       <WordCloud words={words} width={600} height={400} className="my-cloud" />
     );
     const div = container.firstChild as HTMLElement;
-    expect(div.classList.contains('react-word-cloud')).toBe(true);
+    expect(div.classList.contains('react-jqcloud')).toBe(true);
     expect(div.classList.contains('my-cloud')).toBe(true);
   });
 

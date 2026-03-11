@@ -479,7 +479,7 @@ export default function App() {
 
   return (
     <div style={{ fontFamily: 'sans-serif', padding: 24, maxWidth: 800 }}>
-      <h1 style={{ margin: '0 0 4px' }}>React Word Cloud</h1>
+      <h1 style={{ margin: '0 0 4px' }}>React JQCloud</h1>
       <p style={{ margin: '0 0 20px', color: '#666', fontSize: 14 }}>Demos</p>
 
       {/* Demo selector */}

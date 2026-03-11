@@ -1,28 +1,28 @@
-.react-word-cloud {
+.react-jqcloud {
   overflow: hidden;
   position: relative;
   font-family: "Helvetica", "Arial", sans-serif;
 }
 
-.react-word-cloud span {
+.react-jqcloud span {
   position: absolute;
   padding: 0;
   cursor: default;
 }
 
-.react-word-cloud a {
+.react-jqcloud a {
   text-decoration: none;
   color: inherit;
 }
 
 /* Weight classes for color theming (font sizes are inline) */
-.react-word-cloud .w10 { color: #0cf; }
-.react-word-cloud .w9  { color: #0cf; }
-.react-word-cloud .w8  { color: #0cf; }
-.react-word-cloud .w7  { color: #39d; }
-.react-word-cloud .w6  { color: #90c5f0; }
-.react-word-cloud .w5  { color: #90a0dd; }
-.react-word-cloud .w4  { color: #90c5f0; }
-.react-word-cloud .w3  { color: #a0ddff; }
-.react-word-cloud .w2  { color: #99ccee; }
-.react-word-cloud .w1  { color: #aab5f0; }
+.react-jqcloud .w10 { color: #0cf; }
+.react-jqcloud .w9  { color: #0cf; }
+.react-jqcloud .w8  { color: #0cf; }
+.react-jqcloud .w7  { color: #39d; }
+.react-jqcloud .w6  { color: #90c5f0; }
+.react-jqcloud .w5  { color: #90a0dd; }
+.react-jqcloud .w4  { color: #90c5f0; }
+.react-jqcloud .w3  { color: #a0ddff; }
+.react-jqcloud .w2  { color: #99ccee; }
+.react-jqcloud .w1  { color: #aab5f0; }
