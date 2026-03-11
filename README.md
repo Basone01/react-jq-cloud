@@ -4,6 +4,8 @@ A React + TypeScript word cloud component based on the layout algorithm from [jQ
 
 Words are placed on a spiral (elliptic or rectangular) starting from the center outward. Heavier words land closest to the center. Collision detection uses AABB (axis-aligned bounding box) checks so words never overlap. Font sizes are rendered with a **two-pass approach** — words are first rendered invisibly to measure their real DOM dimensions, then the pure layout algorithm runs, and finally words are re-rendered at their computed positions.
 
+**🟢 [Live Demo](https://react-jq-cloud.basone01.com/)**
+
 ---
 
 ## Table of contents
