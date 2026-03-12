@@ -43,7 +43,7 @@ Peer dependencies (`react` and `react-dom` ≥ 17) must already be installed in 
 ## Quick start
 
 ```tsx
-import { WordCloud } from '@basone01/react-jq-cloud';
+import { ReactJQCloud } from '@basone01/react-jq-cloud';
 import '@basone01/react-jq-cloud/styles.css';
 
 const words = [
@@ -55,7 +55,7 @@ const words = [
 ];
 
 export default function App() {
-  return <WordCloud words={words} width={600} height={400} />;
+  return <ReactJQCloud words={words} width={600} height={400} />;
 }
 ```
 
@@ -120,7 +120,7 @@ When you import `@basone01/react-jq-cloud/styles.css` each word receives a class
 Pass a 10-element array to the `colors` prop. Index 0 maps to class `w1` (lightest), index 9 to `w10` (heaviest):
 
 ```tsx
-<WordCloud
+<ReactJQCloud
   words={words}
   width={600}
   height={400}
@@ -140,7 +140,7 @@ A per-word `color` field takes precedence over both the `colors` prop and the CS
 ### Clickable words
 
 ```tsx
-<WordCloud
+<ReactJQCloud
   words={words}
   width={600}
   height={400}
@@ -160,7 +160,7 @@ const words = [
   { text: 'Vite',   weight: 8,  link: { href: 'https://vitejs.dev', target: '_blank' } },
 ];
 
-<WordCloud words={words} width={600} height={400} />
+<ReactJQCloud words={words} width={600} height={400} />
 ```
 
 ### Animated reveal with `wordDelay`
@@ -168,7 +168,7 @@ const words = [
 Words appear one by one after layout, heaviest first.
 
 ```tsx
-<WordCloud
+<ReactJQCloud
   words={words}
   width={600}
   height={400}
@@ -185,7 +185,7 @@ Set `wordDelay={0}` (the default) to skip the animation.
 ```tsx
 const [progress, setProgress] = useState({ revealed: 0, total: 0 });
 
-<WordCloud
+<ReactJQCloud
   words={words}
   width={600}
   height={400}
@@ -201,7 +201,7 @@ const [progress, setProgress] = useState({ revealed: 0, total: 0 });
 When the canvas is small or the word list is large, some words may be pushed outside the container and dropped. `shrinkToFit` reduces the overall font scale in steps of 15 % until every word fits — down to a minimum of 30 % of the original `fontSizes`.
 
 ```tsx
-<WordCloud
+<ReactJQCloud
   words={words}
   width={400}
   height={300}
@@ -220,7 +220,7 @@ const [ready, setReady] = useState(false);
 
 <>
   {!ready && <Spinner />}
-  <WordCloud
+  <ReactJQCloud
     words={words}
     width={600}
     height={400}
@@ -246,7 +246,7 @@ function MyCloud() {
   if (words.length === 0) return <Spinner />;
 
   return (
-    <WordCloud
+    <ReactJQCloud
       words={words}
       width={700}
       height={450}
@@ -298,14 +298,14 @@ npm install
 ```
 src/
   index.ts        public exports
-  types.ts        TypeScript interfaces (Word, WordCloudProps)
+  types.ts        TypeScript interfaces (Word, ReactJQCloudProps)
   layout.ts       pure layout algorithm — no DOM, fully unit-tested
-  WordCloud.tsx   React component (two-pass render)
+  ReactJQCloud.tsx   React component (two-pass render)
   styles.css      default w1–w10 color classes
 
 test/
   layout.test.ts       unit tests for the layout algorithm
-  WordCloud.test.tsx   component rendering tests
+  ReactJQCloud.test.tsx   component rendering tests
   setup.ts             jest-dom setup
 
 example/
