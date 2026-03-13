@@ -1020,6 +1020,10 @@ function PlaygroundDemo() {
   const [wrapPct, setWrapPct] = useState(25);
   const [useEllipsis, setUseEllipsis] = useState(false);
   const [ellipsisPct, setEllipsisPct] = useState(25);
+  const [useWrapOnLimit, setUseWrapOnLimit] = useState(false);
+  const [wrapOnLimitPct, setWrapOnLimitPct] = useState(25);
+  const [useEllipsisOnLimit, setUseEllipsisOnLimit] = useState(false);
+  const [ellipsisOnLimitPct, setEllipsisOnLimitPct] = useState(25);
   const [hashPrefix, setHashPrefix] = useState(false);
   const [cloudKey, setCloudKey] = useState(0);
 
@@ -1039,6 +1043,8 @@ function PlaygroundDemo() {
     !removeOverflowing && !shrinkToFit ? `removeOverflowing={false}` : null,
     useWrap ? `wrapAtPercent={${wrapPct}}` : null,
     useEllipsis ? `ellipsisAtPercent={${ellipsisPct}}` : null,
+    useWrapOnLimit ? `wrapAtPercentOnLimit={${wrapOnLimitPct}}` : null,
+    useEllipsisOnLimit ? `ellipsisAtPercentOnLimit={${ellipsisOnLimitPct}}` : null,
     hashPrefix ? `renderText={(word) => '#' + word.text}` : null,
   ].filter(Boolean).map(p => `  ${p}`).join('\n');
 
@@ -1105,6 +1111,16 @@ function PlaygroundDemo() {
           {useEllipsis && <Slider min={5} max={80} step={5} value={ellipsisPct} onChange={v => { setEllipsisPct(v); reset(); }} unit="%" />}
         </Row>
 
+        <Row label="Wrap on limit %">
+          <Toggle label="Enable (shrinkToFit only)" checked={useWrapOnLimit} disabled={!shrinkToFit} onChange={v => { setUseWrapOnLimit(v); if (v) setUseEllipsisOnLimit(false); reset(); }} />
+          {useWrapOnLimit && shrinkToFit && <Slider min={5} max={80} step={5} value={wrapOnLimitPct} onChange={v => { setWrapOnLimitPct(v); reset(); }} unit="%" />}
+        </Row>
+
+        <Row label="Ellipsis on limit %">
+          <Toggle label="Enable (shrinkToFit only)" checked={useEllipsisOnLimit} disabled={!shrinkToFit} onChange={v => { setUseEllipsisOnLimit(v); if (v) setUseWrapOnLimit(false); reset(); }} />
+          {useEllipsisOnLimit && shrinkToFit && <Slider min={5} max={80} step={5} value={ellipsisOnLimitPct} onChange={v => { setEllipsisOnLimitPct(v); reset(); }} unit="%" />}
+        </Row>
+
         <Row label="Render text">
           <Toggle label="Hashtag prefix (#)" checked={hashPrefix} onChange={v => { setHashPrefix(v); reset(); }} />
         </Row>
@@ -1124,6 +1140,8 @@ function PlaygroundDemo() {
         removeOverflowing={removeOverflowing}
         wrapAtPercent={useWrap ? wrapPct : undefined}
         ellipsisAtPercent={useEllipsis ? ellipsisPct : undefined}
+        wrapAtPercentOnLimit={useWrapOnLimit && shrinkToFit ? wrapOnLimitPct : undefined}
+        ellipsisAtPercentOnLimit={useEllipsisOnLimit && shrinkToFit ? ellipsisOnLimitPct : undefined}
         renderText={hashPrefix ? (word) => '#' + word.text : undefined}
         style={{ border: '1px solid #ddd', borderRadius: 8, background: '#fafafa' }}
       />

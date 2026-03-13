@@ -26,6 +26,8 @@ export interface ReactJQCloudProps {
   spacing?: number;             // extra px padding around each word's bounding box (default 0)
   wrapAtPercent?: number;              // max-width as % of container width; words wider than this wrap onto multiple lines
   ellipsisAtPercent?: number;          // max-width as % of container width; words wider than this are truncated with "…"
+  wrapAtPercentOnLimit?: number;       // like wrapAtPercent, but only activates when shrinkToFit reaches its minimum scale
+  ellipsisAtPercentOnLimit?: number;   // like ellipsisAtPercent, but only activates when shrinkToFit reaches its minimum scale
   shrinkToFit?: boolean;        // reduce font scale until all words fit within bounds
   wordDelay?: number;           // ms between each word appearing (0 = all at once)
   onWordClick?: (word: Word, event: React.MouseEvent) => void;

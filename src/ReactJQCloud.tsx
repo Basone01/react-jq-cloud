@@ -17,6 +17,8 @@ export function ReactJQCloud({
   spacing = 0,
   wrapAtPercent,
   ellipsisAtPercent,
+  wrapAtPercentOnLimit,
+  ellipsisAtPercentOnLimit,
   shrinkToFit = false,
   fontSizes = [12, 60],
   fontFamily,
@@ -39,6 +41,8 @@ export function ReactJQCloud({
     useState<[number, number]>(fontSizes);
   // How many words have been revealed so far (for wordDelay animation)
   const [revealedCount, setRevealedCount] = useState(0);
+  // True after shrinkToFit exhausts its minimum scale and on-limit fallback props activate
+  const [fallbackTriggered, setFallbackTriggered] = useState(false);
   const spanRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [tooltip, setTooltip] = useState<{ word: Word; rect: DOMRect } | null>(null);
@@ -106,6 +110,7 @@ export function ReactJQCloud({
     setPositions(null);
     setActiveFontSizes(fontSizes);
     setRevealedCount(0);
+    setFallbackTriggered(false);
   }, [
     words,
     layoutWidth,
@@ -157,6 +162,11 @@ export function ReactJQCloud({
             activeFontSizes[1] * SHRINK_STEP,
           ]);
           return; // re-render → re-measure at smaller font
+        }
+        // At minimum scale — activate on-limit fallback props if provided and not yet triggered
+        if (!fallbackTriggered && (wrapAtPercentOnLimit !== undefined || ellipsisAtPercentOnLimit !== undefined)) {
+          setFallbackTriggered(true);
+          return; // re-render with fallback CSS constraints → re-measure
         }
       }
 
@@ -234,10 +244,16 @@ export function ReactJQCloud({
           visibility: isRevealed ? "visible" : "hidden",
           left: pos ? pos.left : 0,
           top: pos ? pos.top : 0,
-          whiteSpace: wrapAtPercent ? "normal" : "nowrap",
+          whiteSpace: (wrapAtPercent || (fallbackTriggered && wrapAtPercentOnLimit)) ? "normal" : "nowrap",
           ...(wrapAtPercent ? { maxWidth: `${wrapAtPercent}%`, wordBreak: "break-word" } : {}),
+          ...(fallbackTriggered && wrapAtPercentOnLimit && !wrapAtPercent
+            ? { maxWidth: `${wrapAtPercentOnLimit}%`, wordBreak: "break-word" }
+            : {}),
           ...(ellipsisAtPercent
             ? { maxWidth: `${ellipsisAtPercent}%`, overflow: "hidden", textOverflow: "ellipsis" }
+            : {}),
+          ...(fallbackTriggered && ellipsisAtPercentOnLimit && !ellipsisAtPercent
+            ? { maxWidth: `${ellipsisAtPercentOnLimit}%`, overflow: "hidden", textOverflow: "ellipsis" }
             : {}),
           ...(word.color
             ? { color: word.color }

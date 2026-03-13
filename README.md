@@ -23,6 +23,7 @@ Words are placed on a spiral (elliptic or rectangular) starting from the center 
   - [Animated reveal with wordDelay](#animated-reveal-with-worddelay)
   - [Track reveal progress](#track-reveal-progress)
   - [Fit all words with shrinkToFit](#fit-all-words-with-shrinktofit)
+  - [Wrap / truncate only when shrinkToFit hits its limit](#wrap--truncate-only-when-shrinktofit-hits-its-limit)
   - [React to render completion](#react-to-render-completion)
   - [Custom tooltips](#custom-tooltips)
   - [Embedding HTML in words](#embedding-html-in-words)
@@ -81,6 +82,8 @@ The stylesheet provides the default `w1`–`w10` color classes. You can skip it 
 | `spacing` | `number` | `0` | Extra pixels of padding added around each word's bounding box during collision detection. Increase to add breathing room between words. |
 | `wrapAtPercent` | `number` | — | Max width as a percentage of the container width. Words wider than this wrap onto multiple lines. |
 | `ellipsisAtPercent` | `number` | — | Max width as a percentage of the container width. Words wider than this are truncated with `…`. |
+| `wrapAtPercentOnLimit` | `number` | — | Like `wrapAtPercent`, but only activates when `shrinkToFit` reaches its minimum scale (30 %). Use as a last-resort fallback for very dense clouds. |
+| `ellipsisAtPercentOnLimit` | `number` | — | Like `ellipsisAtPercent`, but only activates when `shrinkToFit` reaches its minimum scale (30 %). Use as a last-resort fallback for very dense clouds. |
 | `shrinkToFit` | `boolean` | `false` | Iteratively reduce font scale (down to 30 % of original) until all words fit inside the container. Overrides `removeOverflowing`. |
 | `wordDelay` | `number` | `0` | Milliseconds between each word appearing after layout. Words reveal in weight-descending order (heaviest first). `0` = all words appear at once. |
 | `colors` | `string[]` | — | 10-element color array indexed by weight class (index 0 = class `w1`). Overrides CSS classes. |
@@ -270,6 +273,22 @@ Pass `renderTooltip` to show a tooltip on hover. It receives the `Word` object a
 ```
 
 The tooltip div is positioned above the hovered word via `position: fixed` + `transform: translate(-50%, -100%)`. You have full control over its appearance through the returned node.
+
+### Wrap / truncate only when shrinkToFit hits its limit
+
+`wrapAtPercentOnLimit` and `ellipsisAtPercentOnLimit` are fallback versions of `wrapAtPercent` / `ellipsisAtPercent` that only kick in after `shrinkToFit` has exhausted its minimum scale (30 % of `fontSizes`). If words still don't fit at that point, the constraint is applied and layout re-runs one final time with the constrained dimensions.
+
+```tsx
+<ReactJQCloud
+  words={words}
+  width={400}
+  height={300}
+  shrinkToFit
+  ellipsisAtPercentOnLimit={20}  // truncate only if shrink can't fit everything
+/>
+```
+
+This lets you keep clean, unconstrained word shapes in most cases while gracefully handling very dense word sets without dropping words.
 
 ### Wrapping and truncating long words
 
