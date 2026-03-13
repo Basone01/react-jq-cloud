@@ -24,6 +24,7 @@ export function ReactJQCloud({
   onWordClick,
   onWordReveal,
   afterCloudRender,
+  renderText,
   renderTooltip,
   tooltipContainer,
 }: ReactJQCloudProps) {
@@ -253,6 +254,8 @@ export function ReactJQCloud({
           ? (e: React.MouseEvent) => onWordClick(word, e)
           : undefined;
 
+        const displayText = renderText ? renderText(word) : word.text;
+
         const inner = word.link ? (
           <a
             href={typeof word.link === "string" ? word.link : word.link.href}
@@ -262,10 +265,10 @@ export function ReactJQCloud({
             onClick={handleClick}
             {...word.html}
           >
-            {word.text}
+            {displayText}
           </a>
         ) : (
-          word.text
+          displayText
         );
 
         const tooltipHandlers = renderTooltip

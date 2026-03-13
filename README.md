@@ -86,6 +86,7 @@ The stylesheet provides the default `w1`–`w10` color classes. You can skip it 
 | `onWordClick` | `(word: Word, event: React.MouseEvent) => void` | — | Click handler called with the `Word` object and the native event. |
 | `onWordReveal` | `(revealed: number, total: number) => void` | — | Called on each step of the `wordDelay` animation with the current count and total placed words. |
 | `afterCloudRender` | `() => void` | — | Called once after all words are visible (after the last `wordDelay` step when used, or immediately after layout otherwise). |
+| `renderText` | `(word: Word) => string` | — | Override the displayed text for each word. Receives the `Word` object; the returned string is rendered in place of `word.text`. Layout measurement still uses `word.text`. |
 | `renderTooltip` | `(word: Word) => React.ReactNode` | — | Custom tooltip renderer. Called with the hovered `Word`; the returned node is rendered in a portal above the word. |
 | `tooltipContainer` | `Element` | `document.body` | DOM element used as the portal target for `renderTooltip`. |
 

@@ -414,6 +414,16 @@ const words = [
     </div>
   )}
 />`,
+
+  hashtag: `\
+// Use renderText to add a "#" prefix to every word.
+
+<ReactJQCloud
+  words={words}
+  width={740}
+  height={460}
+  renderText={(word) => '#' + word.text}
+/>`,
 };
 
 // ─── Self-contained demos ─────────────────────────────────────────────────────
@@ -748,9 +758,28 @@ function TooltipDemo() {
   );
 }
 
+function HashtagDemo() {
+  return (
+    <div>
+      <ReactJQCloud
+        words={basicWords}
+        width={740}
+        height={460}
+        renderText={(word) => '#' + word.text}
+        style={{ border: '1px solid #ddd', borderRadius: 8, background: '#fafafa' }}
+      />
+      <p style={{ marginTop: 8, fontSize: 12, color: '#888' }}>
+        <code>renderText</code> prepends <code>#</code> to every word at render time.
+        Layout sizing still uses the original <code>word.text</code>.
+      </p>
+      <ShowCode code={SNIPPETS['hashtag']!} />
+    </div>
+  );
+}
+
 // ─── Main App ─────────────────────────────────────────────────────────────────
 
-type DemoKey = 'basic' | 'links' | 'long' | 'fifty' | 'delay' | 'word-delay' | 'shrink' | 'fluid' | 'html' | 'tooltip';
+type DemoKey = 'basic' | 'links' | 'long' | 'fifty' | 'delay' | 'word-delay' | 'shrink' | 'fluid' | 'html' | 'tooltip' | 'hashtag';
 
 const DEMOS: { key: DemoKey; label: string; words: Word[]; description: string }[] = [
   { key: 'basic',      label: 'Basic',           words: basicWords,   description: '20 words — shape toggle' },
@@ -763,6 +792,7 @@ const DEMOS: { key: DemoKey; label: string; words: Word[]; description: string }
   { key: 'fluid',      label: 'Fluid width',       words: [],           description: 'Pass width="100%" to fill the container. A ResizeObserver re-lays out the cloud on every resize.' },
   { key: 'html',       label: 'HTML words',        words: [],           description: 'Use the html field to embed emoji or arbitrary inline HTML inside each word.' },
   { key: 'tooltip',    label: 'Tooltip',           words: [],           description: 'renderTooltip prop: hover a word to show a custom tooltip rendered in a portal.' },
+  { key: 'hashtag',    label: 'Hashtag prefix',    words: [],           description: 'renderText prop: prepend "#" to every word label without changing layout sizing.' },
 ];
 
 export default function App() {
@@ -773,7 +803,7 @@ export default function App() {
   const [clicked, setClicked] = useState<string | null>(null);
 
   const current = DEMOS.find(d => d.key === demo)!;
-  const isSelfContained = demo === 'delay' || demo === 'word-delay' || demo === 'shrink' || demo === 'fluid' || demo === 'html' || demo === 'tooltip';
+  const isSelfContained = demo === 'delay' || demo === 'word-delay' || demo === 'shrink' || demo === 'fluid' || demo === 'html' || demo === 'tooltip' || demo === 'hashtag';
 
   useEffect(() => {
     const id = 'rwc-spin-style';
@@ -852,6 +882,8 @@ export default function App() {
         <HtmlDemo key="html" />
       ) : demo === 'tooltip' ? (
         <TooltipDemo key="tooltip" />
+      ) : demo === 'hashtag' ? (
+        <HashtagDemo key="hashtag" />
       ) : (
         <>
           <ReactJQCloud
