@@ -127,47 +127,37 @@ export function ReactJQCloud({
     }
 
     const frame = requestAnimationFrame(() => {
-      const baseRects = spanRefs.current.slice(0, words.length).map((el) => {
+      // Measure actual DOM dimensions at the current activeFontSizes.
+      const rects = spanRefs.current.slice(0, words.length).map((el) => {
         if (!el) return { width: 0, height: 0 };
         const r = el.getBoundingClientRect();
         return { width: r.width, height: r.height };
       });
 
-      // When shrinkToFit is on, iteratively reduce font scale until all words
-      // fit within the container (no null positions from removeOverflowing).
-      // Rects scale proportionally with font size so no re-measurement needed.
-      let scale = 1.0;
-      let currentFontSizes: [number, number] = fontSizes;
-      let rects = baseRects;
-      let computed = computeLayout(words, rects, {
+      const computed = computeLayout(words, rects, {
         width: layoutWidth,
         height,
         center: resolvedCenter,
         shape,
         removeOverflowing: shrinkToFit ? true : removeOverflowing,
-        fontSizes: currentFontSizes,
+        fontSizes: activeFontSizes,
         spacing,
       });
 
-      if (shrinkToFit) {
-        while (scale > SHRINK_MIN_SCALE && computed.some((p) => p === null)) {
-          scale *= SHRINK_STEP;
-          currentFontSizes = [fontSizes[0] * scale, fontSizes[1] * scale];
-          rects = baseRects.map((r) => ({
-            width: r.width * scale,
-            height: r.height * scale,
-          }));
-          computed = computeLayout(words, rects, {
-            width: layoutWidth,
-            height,
-            center: resolvedCenter,
-            shape,
-            removeOverflowing: true,
-            fontSizes: currentFontSizes,
-            spacing,
-          });
+      // When shrinkToFit is on and words don't fit, reduce the font scale and
+      // leave positions as null so the component re-renders at the smaller font
+      // and this effect re-runs with fresh DOM measurements.
+      // This correctly handles wrap/ellipsis constraints whose height depends
+      // on actual line-wrapping, which can't be approximated by scaling alone.
+      if (shrinkToFit && computed.some((p) => p === null)) {
+        const currentScale = activeFontSizes[0] / fontSizes[0];
+        if (currentScale > SHRINK_MIN_SCALE) {
+          setActiveFontSizes([
+            activeFontSizes[0] * SHRINK_STEP,
+            activeFontSizes[1] * SHRINK_STEP,
+          ]);
+          return; // re-render → re-measure at smaller font
         }
-        setActiveFontSizes(currentFontSizes);
       }
 
       setPositions(computed);

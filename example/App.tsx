@@ -230,6 +230,61 @@ const allDelayWords: Word[] = [
   { text: 'Prettier', weight: 1 },
 ];
 
+// ─── Thai words dataset ───────────────────────────────────────────────────────
+
+const thaiWords: Word[] = [
+  { text: 'ส่งฟรี', weight: 196 },
+  { text: 'ถ้าเป็นลูกค้าใหม่จะให้โอนครึ่งนึงของของนะคะถ้าลูกค้าเก่าจะไม่มีปัญหาค่ะกรุณาแจ้งที่อยู่เบอร์โทรให้ชัดเจนนะคะถ้าไม่ชัดเจนแม่ค้าจะไม่อาจส่งได้นะคะ', weight: 194 },
+  { text: 'พัฒนาชนบท', weight: 194 },
+  { text: 'พิกัดปั๊มปตท', weight: 194 },
+  { text: 'ร่มเกล้าส่งฟรีเฉพาะเขตลาดกระบังเขตอื่นมีค่าส่งคิดตามระยะทาง', weight: 194 },
+  { text: 'เอื้อร่มเกล้าส่งฟรีเฉพาะเขตลาดกระบังนะคะอ่านให้เข้าใจก่อนสั่งซื้อเขตอื่นมีค่าส่งตามรยะทางคะ', weight: 194 },
+  { text: 'ขอบคุณ', weight: 193 },
+  { text: 'นอกเขตนอกพื้นที่ส่งหมดค่ะคิดค่าส่งตามระยะทางเลยค่ะอ่านเข้าใจก่อนสั่งซื้อค่ะ', weight: 193 },
+  { text: 'พิกัดปั๊มปตทคุ้มเกล้าไม่มีหน้าร้านนะคะ', weight: 193 },
+  { text: 'ลาดกระบัง', weight: 193 },
+  { text: 'เบอร์โทรติดต่อ', weight: 193 },
+  { text: 'ไม่รับมิจฉาชีพนะคะไม่ต้องแอดมา❌', weight: 193 },
+  { text: 'พูนสิน', weight: 192 },
+  { text: 'เอื้อทับยาว1_2ส่งฟรีเลยเอื้อทับยาวมีค่าส่ง', weight: 192 },
+  { text: 'หอยเชอรี่ต้มแกะตาแล้ว', weight: 176 },
+  { text: 'กรุณาอ่านให้เข้าใจก่อนสั่งสินค้านะคะ', weight: 163 },
+  { text: 'มิจฉาชีพ', weight: 154 },
+  { text: 'พรรคประชาชน', weight: 135 },
+  { text: 'เริ่มส่งบ่าย', weight: 133 },
+  { text: 'เก็บเงินปลายทางได้นะคะแต่ต้องจ่ายให้แม่ค้านะคะถ้าไม่จ่ายจะดำเนินตามกฎหมายนะคะเป็น2เท่าคะ', weight: 128 },
+  { text: 'ถ้าใช้หอยสดหอยแกะ5_10กิโลสั่งล่วงหน้า', weight: 124 },
+  { text: 'หอยเชอรี่สดคละไซส์กิโลละ', weight: 119 },
+  { text: 'สแกมเมอร์', weight: 116 },
+  { text: 'กกต', weight: 102 },
+  { text: 'ผักบ้านๆสวนครัวปลอดสารผักสดสั่งได้เลยนะคะหอยสดหอยแกะสั่งล่วงหน้าน่อยเพราะช่วงนี้หายหายาก', weight: 98 },
+  { text: 'หอยถ้ารับเยอะถามสอบถามก่อนนะคะ🐌', weight: 98 },
+  { text: 'กรุณาอ่านให้เข้าใจก่อนสั่งซื้อนะคะ🙏🏻', weight: 94 },
+  { text: 'เตือนภัย', weight: 88 },
+  { text: 'laserid', weight: 83 },
+  { text: 'เตือนภัยออนไลน์', weight: 78 },
+  { text: 'เลือกตั้ง69', weight: 77 },
+  { text: 'thaipbs', weight: 76 },
+  { text: 'ชีวิตง่ายได้ทุกวัน', weight: 76 },
+  { text: 'แก๊งคอลเซ็นเตอร์', weight: 73 },
+  { text: 'บุ๋มปนัดดา', weight: 69 },
+  { text: 'krungsricard', weight: 60 },
+  { text: 'ข่าววันนี้', weight: 60 },
+  { text: 'บัตรเครดิต', weight: 60 },
+  { text: 'เริ่มส่ง', weight: 60 },
+  { text: 'topnewstv', weight: 59 },
+  { text: 'บัตรเครดิตกรุงศรี', weight: 57 },
+  { text: 'คุณค่าในแบบคุณ', weight: 50 },
+  { text: 'บัญชีม้า', weight: 49 },
+  { text: 'pptvhd36', weight: 47 },
+  { text: 'เตือนภัยมิจฉาชีพ', weight: 47 },
+  { text: 'เรื่องข่าวเรื่องใหญ่', weight: 47 },
+  { text: 'โปรดีบอกต่อ', weight: 46 },
+  { text: 'ภัยไซเบอร์', weight: 45 },
+  { text: 'การเมือง', weight: 44 },
+  { text: 'ข่าวtiktok', weight: 43 },
+];
+
 // ─── Code snippets ────────────────────────────────────────────────────────────
 
 const fluidWords: Word[] = basicWords;
@@ -911,9 +966,180 @@ function OverflowDemo() {
   );
 }
 
+// ─── Playground ───────────────────────────────────────────────────────────────
+
+type DatasetKey = 'thai' | 'basic' | 'fifty' | 'long' | 'links';
+
+const DATASETS: { key: DatasetKey; label: string; words: Word[] }[] = [
+  { key: 'thai',  label: 'Thai (50)',    words: thaiWords },
+  { key: 'basic', label: 'Basic (20)',   words: basicWords },
+  { key: 'fifty', label: '50 Keywords', words: fiftyWords },
+  { key: 'long',  label: 'Long Words',  words: longWords },
+  { key: 'links', label: 'With Links',  words: linkedWords },
+];
+
+function Row({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+      <span style={{ minWidth: 140, fontSize: 13, color: '#555', fontWeight: 600 }}>{label}</span>
+      {children}
+    </div>
+  );
+}
+
+function Toggle({ label, checked, onChange, disabled }: { label: string; checked: boolean; onChange: (v: boolean) => void; disabled?: boolean }) {
+  return (
+    <label style={{ display: 'flex', gap: 6, alignItems: 'center', cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.4 : 1, fontSize: 13 }}>
+      <input type="checkbox" checked={checked} disabled={disabled} onChange={e => onChange(e.target.checked)} />
+      {label}
+    </label>
+  );
+}
+
+function Slider({ min, max, step, value, onChange, unit = '' }: { min: number; max: number; step: number; value: number; onChange: (v: number) => void; unit?: string }) {
+  return (
+    <label style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 13 }}>
+      <input type="range" min={min} max={max} step={step} value={value}
+        onChange={e => onChange(Number(e.target.value))} style={{ width: 140 }} />
+      <code style={{ minWidth: 48 }}>{value}{unit}</code>
+    </label>
+  );
+}
+
+function PlaygroundDemo() {
+  const [dataset, setDataset] = useState<DatasetKey>('thai');
+  const [shape, setShape] = useState<'elliptic' | 'rectangular'>('elliptic');
+  const [height, setHeight] = useState(460);
+  const [fontMin, setFontMin] = useState(12);
+  const [fontMax, setFontMax] = useState(60);
+  const [spacing, setSpacing] = useState(4);
+  const [wordDelay, setWordDelay] = useState(0);
+  const [shrinkToFit, setShrinkToFit] = useState(false);
+  const [removeOverflowing, setRemoveOverflowing] = useState(true);
+  const [useWrap, setUseWrap] = useState(false);
+  const [wrapPct, setWrapPct] = useState(25);
+  const [useEllipsis, setUseEllipsis] = useState(false);
+  const [ellipsisPct, setEllipsisPct] = useState(25);
+  const [hashPrefix, setHashPrefix] = useState(false);
+  const [cloudKey, setCloudKey] = useState(0);
+
+  function reset() { setCloudKey(k => k + 1); }
+
+  const words = DATASETS.find(d => d.key === dataset)!.words;
+
+  const propsCode = [
+    `words={words}`,
+    `width="100%"`,
+    `height={${height}}`,
+    shape !== 'elliptic' ? `shape="${shape}"` : null,
+    `fontSizes={[${fontMin}, ${fontMax}]}`,
+    spacing ? `spacing={${spacing}}` : null,
+    wordDelay ? `wordDelay={${wordDelay}}` : null,
+    shrinkToFit ? `shrinkToFit` : null,
+    !removeOverflowing && !shrinkToFit ? `removeOverflowing={false}` : null,
+    useWrap ? `wrapAtPercent={${wrapPct}}` : null,
+    useEllipsis ? `ellipsisAtPercent={${ellipsisPct}}` : null,
+    hashPrefix ? `renderText={(word) => '#' + word.text}` : null,
+  ].filter(Boolean).map(p => `  ${p}`).join('\n');
+
+  const snippet = `<ReactJQCloud\n${propsCode}\n/>`;
+
+  return (
+    <div>
+      {/* Controls */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 20, padding: '16px', background: '#f8f9fa', borderRadius: 8, border: '1px solid #e0e0e0' }}>
+
+        <Row label="Dataset">
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            {DATASETS.map(d => (
+              <button key={d.key} onClick={() => { setDataset(d.key); reset(); }} style={{
+                padding: '4px 12px', borderRadius: 5, border: '1px solid #ccc', fontSize: 12,
+                background: dataset === d.key ? '#0070f3' : '#fff',
+                color: dataset === d.key ? '#fff' : '#333',
+                cursor: 'pointer', fontWeight: dataset === d.key ? 600 : 400,
+              }}>{d.label}</button>
+            ))}
+          </div>
+        </Row>
+
+        <Row label="Shape">
+          {(['elliptic', 'rectangular'] as const).map(s => (
+            <label key={s} style={{ cursor: 'pointer', fontSize: 13, display: 'flex', gap: 4, alignItems: 'center' }}>
+              <input type="radio" value={s} checked={shape === s} onChange={() => { setShape(s); reset(); }} />
+              {s.charAt(0).toUpperCase() + s.slice(1)}
+            </label>
+          ))}
+        </Row>
+
+        <Row label="Height">
+          <Slider min={200} max={800} step={20} value={height} onChange={v => { setHeight(v); reset(); }} unit="px" />
+        </Row>
+
+        <Row label="Font sizes">
+          <span style={{ fontSize: 12, color: '#888' }}>min</span>
+          <Slider min={6} max={40} step={1} value={fontMin} onChange={v => { setFontMin(v); reset(); }} unit="px" />
+          <span style={{ fontSize: 12, color: '#888' }}>max</span>
+          <Slider min={20} max={120} step={2} value={fontMax} onChange={v => { setFontMax(v); reset(); }} unit="px" />
+        </Row>
+
+        <Row label="Spacing">
+          <Slider min={0} max={20} step={1} value={spacing} onChange={v => { setSpacing(v); reset(); }} unit="px" />
+        </Row>
+
+        <Row label="Word delay">
+          <Slider min={0} max={500} step={10} value={wordDelay} onChange={v => { setWordDelay(v); reset(); }} unit="ms" />
+        </Row>
+
+        <Row label="Fit / overflow">
+          <Toggle label="Shrink to fit" checked={shrinkToFit} onChange={v => { setShrinkToFit(v); if (v) setRemoveOverflowing(true); reset(); }} />
+          <Toggle label="Remove overflowing" checked={removeOverflowing} disabled={shrinkToFit} onChange={v => { setRemoveOverflowing(v); reset(); }} />
+        </Row>
+
+        <Row label="Wrap at %">
+          <Toggle label="Enable" checked={useWrap} onChange={v => { setUseWrap(v); if (v) setUseEllipsis(false); reset(); }} />
+          {useWrap && <Slider min={5} max={80} step={5} value={wrapPct} onChange={v => { setWrapPct(v); reset(); }} unit="%" />}
+        </Row>
+
+        <Row label="Ellipsis at %">
+          <Toggle label="Enable" checked={useEllipsis} onChange={v => { setUseEllipsis(v); if (v) setUseWrap(false); reset(); }} />
+          {useEllipsis && <Slider min={5} max={80} step={5} value={ellipsisPct} onChange={v => { setEllipsisPct(v); reset(); }} unit="%" />}
+        </Row>
+
+        <Row label="Render text">
+          <Toggle label="Hashtag prefix (#)" checked={hashPrefix} onChange={v => { setHashPrefix(v); reset(); }} />
+        </Row>
+      </div>
+
+      {/* Cloud */}
+      <ReactJQCloud
+        key={cloudKey}
+        words={words}
+        width="100%"
+        height={height}
+        shape={shape}
+        fontSizes={[fontMin, fontMax]}
+        spacing={spacing}
+        wordDelay={wordDelay}
+        shrinkToFit={shrinkToFit}
+        removeOverflowing={removeOverflowing}
+        wrapAtPercent={useWrap ? wrapPct : undefined}
+        ellipsisAtPercent={useEllipsis ? ellipsisPct : undefined}
+        renderText={hashPrefix ? (word) => '#' + word.text : undefined}
+        style={{ border: '1px solid #ddd', borderRadius: 8, background: '#fafafa' }}
+      />
+
+      {/* Live snippet */}
+      <div style={{ marginTop: 16 }}>
+        <p style={{ margin: '0 0 6px', fontSize: 12, color: '#888' }}>Generated code</p>
+        <CodeBlock code={snippet} />
+      </div>
+    </div>
+  );
+}
+
 // ─── Main App ─────────────────────────────────────────────────────────────────
 
-type DemoKey = 'basic' | 'links' | 'long' | 'fifty' | 'delay' | 'word-delay' | 'shrink' | 'fluid' | 'html' | 'tooltip' | 'hashtag' | 'spacing' | 'overflow';
+type DemoKey = 'basic' | 'links' | 'long' | 'fifty' | 'delay' | 'word-delay' | 'shrink' | 'fluid' | 'html' | 'tooltip' | 'hashtag' | 'spacing' | 'overflow' | 'playground';
 
 const DEMOS: { key: DemoKey; label: string; words: Word[]; description: string }[] = [
   { key: 'basic',      label: 'Basic',           words: basicWords,   description: '20 words — shape toggle' },
@@ -928,7 +1154,8 @@ const DEMOS: { key: DemoKey; label: string; words: Word[]; description: string }
   { key: 'tooltip',    label: 'Tooltip',           words: [],           description: 'renderTooltip prop: hover a word to show a custom tooltip rendered in a portal.' },
   { key: 'hashtag',    label: 'Hashtag prefix',    words: [],           description: 'renderText prop: prepend "#" to every word label without changing layout sizing.' },
   { key: 'spacing',    label: 'Spacing',           words: [],           description: '50 words — drag the slider to add breathing room between words via the spacing prop.' },
-  { key: 'overflow',   label: 'Wrap / Ellipsis',   words: [],           description: 'wrapAtPercent and ellipsisAtPercent props: constrain long words to a max percentage of the container width.' },
+  { key: 'overflow',    label: 'Wrap / Ellipsis',   words: [],           description: 'wrapAtPercent and ellipsisAtPercent props: constrain long words to a max percentage of the container width.' },
+  { key: 'playground', label: '🛝 Playground',      words: [],           description: 'Live playground — toggle every prop and switch datasets (incl. Thai). Generates code as you go.' },
 ];
 
 export default function App() {
@@ -939,7 +1166,7 @@ export default function App() {
   const [clicked, setClicked] = useState<string | null>(null);
 
   const current = DEMOS.find(d => d.key === demo)!;
-  const isSelfContained = demo === 'delay' || demo === 'word-delay' || demo === 'shrink' || demo === 'fluid' || demo === 'html' || demo === 'tooltip' || demo === 'hashtag' || demo === 'spacing' || demo === 'overflow';
+  const isSelfContained = demo === 'delay' || demo === 'word-delay' || demo === 'shrink' || demo === 'fluid' || demo === 'html' || demo === 'tooltip' || demo === 'hashtag' || demo === 'spacing' || demo === 'overflow' || demo === 'playground';
 
   useEffect(() => {
     const id = 'rwc-spin-style';
@@ -1024,6 +1251,8 @@ export default function App() {
         <SpacingDemo key="spacing" />
       ) : demo === 'overflow' ? (
         <OverflowDemo key="overflow" />
+      ) : demo === 'playground' ? (
+        <PlaygroundDemo key="playground" />
       ) : (
         <>
           <ReactJQCloud
