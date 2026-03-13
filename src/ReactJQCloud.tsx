@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { computeLayout } from "./layout";
 import type { WordPosition } from "./layout";
-import type { ReactJQCloudProps } from "./types";
+import type { Word, ReactJQCloudProps } from "./types";
 
 const SHRINK_STEP = 0.85;
 const SHRINK_MIN_SCALE = 0.3;
@@ -23,6 +24,8 @@ export function ReactJQCloud({
   onWordClick,
   onWordReveal,
   afterCloudRender,
+  renderTooltip,
+  tooltipContainer,
 }: ReactJQCloudProps) {
   const [positions, setPositions] = useState<(WordPosition | null)[] | null>(
     null,
@@ -34,6 +37,7 @@ export function ReactJQCloud({
   const [revealedCount, setRevealedCount] = useState(0);
   const spanRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const [tooltip, setTooltip] = useState<{ word: Word; rect: DOMRect } | null>(null);
 
   // Resolved pixel width — equals the prop when it's a number, or the measured
   // container width when it's a CSS string like "100%".
@@ -264,6 +268,14 @@ export function ReactJQCloud({
           word.text
         );
 
+        const tooltipHandlers = renderTooltip
+          ? {
+              onMouseEnter: (e: React.MouseEvent) =>
+                setTooltip({ word, rect: e.currentTarget.getBoundingClientRect() }),
+              onMouseLeave: () => setTooltip(null),
+            }
+          : {};
+
         return (
           <span
             key={i}
@@ -273,12 +285,31 @@ export function ReactJQCloud({
             className={classes}
             style={spanStyle}
             onClick={!word.link ? handleClick : undefined}
+            {...tooltipHandlers}
             {...word.html}
           >
             {inner}
           </span>
         );
       })}
+
+      {tooltip &&
+        renderTooltip &&
+        createPortal(
+          <div
+            style={{
+              position: "fixed",
+              left: tooltip.rect.left + tooltip.rect.width / 2,
+              top: tooltip.rect.top,
+              transform: "translate(-50%, -100%)",
+              pointerEvents: "none",
+              zIndex: 9999,
+            }}
+          >
+            {renderTooltip(tooltip.word)}
+          </div>,
+          tooltipContainer ?? document.body,
+        )}
     </div>
   );
 }

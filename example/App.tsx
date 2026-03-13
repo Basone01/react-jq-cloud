@@ -390,6 +390,30 @@ const words = [
 ];
 
 <ReactJQCloud words={words} width={740} height={460} />`,
+
+  tooltip: `\
+// renderTooltip receives the Word object and returns any React node.
+// The tooltip is rendered in a portal so it is never clipped.
+
+<ReactJQCloud
+  words={words}
+  width={740}
+  height={460}
+  renderTooltip={(word) => (
+    <div style={{
+      background: '#1e1e2e',
+      color: '#cdd6f4',
+      padding: '6px 10px',
+      borderRadius: 6,
+      fontSize: 12,
+      boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+      marginBottom: 6,
+    }}>
+      <strong>{word.text}</strong>
+      <span style={{ marginLeft: 8, opacity: 0.6 }}>weight: {word.weight}</span>
+    </div>
+  )}
+/>`,
 };
 
 // ─── Self-contained demos ─────────────────────────────────────────────────────
@@ -691,9 +715,42 @@ function HtmlDemo() {
   );
 }
 
+function TooltipDemo() {
+  return (
+    <div>
+      <ReactJQCloud
+        words={basicWords}
+        width={740}
+        height={460}
+        renderTooltip={(word) => (
+          <div style={{
+            background: '#1e1e2e',
+            color: '#cdd6f4',
+            padding: '6px 10px',
+            borderRadius: 6,
+            fontSize: 12,
+            boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+            marginBottom: 6,
+            whiteSpace: 'nowrap',
+          }}>
+            <strong>{word.text}</strong>
+            <span style={{ marginLeft: 8, opacity: 0.6 }}>weight: {word.weight}</span>
+          </div>
+        )}
+        style={{ border: '1px solid #ddd', borderRadius: 8, background: '#fafafa' }}
+      />
+      <p style={{ marginTop: 8, fontSize: 12, color: '#888' }}>
+        Hover any word. <code>renderTooltip</code> receives the <code>Word</code> object and returns
+        any React node — rendered in a portal so it is never clipped by the container.
+      </p>
+      <ShowCode code={SNIPPETS['tooltip']!} />
+    </div>
+  );
+}
+
 // ─── Main App ─────────────────────────────────────────────────────────────────
 
-type DemoKey = 'basic' | 'links' | 'long' | 'fifty' | 'delay' | 'word-delay' | 'shrink' | 'fluid' | 'html';
+type DemoKey = 'basic' | 'links' | 'long' | 'fifty' | 'delay' | 'word-delay' | 'shrink' | 'fluid' | 'html' | 'tooltip';
 
 const DEMOS: { key: DemoKey; label: string; words: Word[]; description: string }[] = [
   { key: 'basic',      label: 'Basic',           words: basicWords,   description: '20 words — shape toggle' },
@@ -705,6 +762,7 @@ const DEMOS: { key: DemoKey; label: string; words: Word[]; description: string }
   { key: 'shrink',     label: 'Shrink to fit',    words: [],           description: 'Compare removeOverflowing vs allowOverflow vs shrinkToFit on 50 words.' },
   { key: 'fluid',      label: 'Fluid width',       words: [],           description: 'Pass width="100%" to fill the container. A ResizeObserver re-lays out the cloud on every resize.' },
   { key: 'html',       label: 'HTML words',        words: [],           description: 'Use the html field to embed emoji or arbitrary inline HTML inside each word.' },
+  { key: 'tooltip',    label: 'Tooltip',           words: [],           description: 'renderTooltip prop: hover a word to show a custom tooltip rendered in a portal.' },
 ];
 
 export default function App() {
@@ -715,7 +773,7 @@ export default function App() {
   const [clicked, setClicked] = useState<string | null>(null);
 
   const current = DEMOS.find(d => d.key === demo)!;
-  const isSelfContained = demo === 'delay' || demo === 'word-delay' || demo === 'shrink' || demo === 'fluid' || demo === 'html';
+  const isSelfContained = demo === 'delay' || demo === 'word-delay' || demo === 'shrink' || demo === 'fluid' || demo === 'html' || demo === 'tooltip';
 
   useEffect(() => {
     const id = 'rwc-spin-style';
@@ -792,6 +850,8 @@ export default function App() {
         <FluidDemo key="fluid" />
       ) : demo === 'html' ? (
         <HtmlDemo key="html" />
+      ) : demo === 'tooltip' ? (
+        <TooltipDemo key="tooltip" />
       ) : (
         <>
           <ReactJQCloud

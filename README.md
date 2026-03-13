@@ -24,6 +24,7 @@ Words are placed on a spiral (elliptic or rectangular) starting from the center 
   - [Track reveal progress](#track-reveal-progress)
   - [Fit all words with shrinkToFit](#fit-all-words-with-shrinktofit)
   - [React to render completion](#react-to-render-completion)
+  - [Custom tooltips](#custom-tooltips)
   - [Embedding HTML in words](#embedding-html-in-words)
   - [Fluid / responsive width](#fluid--responsive-width)
   - [Async data loading pattern](#async-data-loading-pattern)
@@ -85,6 +86,8 @@ The stylesheet provides the default `w1`–`w10` color classes. You can skip it 
 | `onWordClick` | `(word: Word, event: React.MouseEvent) => void` | — | Click handler called with the `Word` object and the native event. |
 | `onWordReveal` | `(revealed: number, total: number) => void` | — | Called on each step of the `wordDelay` animation with the current count and total placed words. |
 | `afterCloudRender` | `() => void` | — | Called once after all words are visible (after the last `wordDelay` step when used, or immediately after layout otherwise). |
+| `renderTooltip` | `(word: Word) => React.ReactNode` | — | Custom tooltip renderer. Called with the hovered `Word`; the returned node is rendered in a portal above the word. |
+| `tooltipContainer` | `Element` | `document.body` | DOM element used as the portal target for `renderTooltip`. |
 
 ### Word shape
 
@@ -234,6 +237,35 @@ const [ready, setReady] = useState(false);
 ```
 
 When `wordDelay` is set, `afterCloudRender` fires after the **last word** is revealed, not immediately after layout.
+
+### Custom tooltips
+
+Pass `renderTooltip` to show a tooltip on hover. It receives the `Word` object and returns any React node. The tooltip is rendered in a `document.body` portal so it is never clipped by the container's `overflow: hidden`.
+
+```tsx
+<ReactJQCloud
+  words={words}
+  width={600}
+  height={400}
+  renderTooltip={(word) => (
+    <div style={{
+      background: '#1e1e2e',
+      color: '#cdd6f4',
+      padding: '6px 10px',
+      borderRadius: 6,
+      fontSize: 12,
+      boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+      marginBottom: 6,
+      whiteSpace: 'nowrap',
+    }}>
+      <strong>{word.text}</strong>
+      <span style={{ marginLeft: 8, opacity: 0.6 }}>weight: {word.weight}</span>
+    </div>
+  )}
+/>
+```
+
+The tooltip div is positioned above the hovered word via `position: fixed` + `transform: translate(-50%, -100%)`. You have full control over its appearance through the returned node.
 
 ### Adding HTML attributes to words
 

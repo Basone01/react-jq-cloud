@@ -28,4 +28,6 @@ export interface ReactJQCloudProps {
   onWordClick?: (word: Word, event: React.MouseEvent) => void;
   onWordReveal?: (revealed: number, total: number) => void;
   afterCloudRender?: () => void;
+  renderTooltip?: (word: Word) => React.ReactNode;
+  tooltipContainer?: Element;
 }
