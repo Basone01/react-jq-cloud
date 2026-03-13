@@ -24,6 +24,7 @@ Words are placed on a spiral (elliptic or rectangular) starting from the center 
   - [Track reveal progress](#track-reveal-progress)
   - [Fit all words with shrinkToFit](#fit-all-words-with-shrinktofit)
   - [React to render completion](#react-to-render-completion)
+  - [Fluid / responsive width](#fluid--responsive-width)
   - [Async data loading pattern](#async-data-loading-pattern)
 - [Credits](#credits)
 - [Contributing](#contributing)
@@ -68,7 +69,7 @@ The stylesheet provides the default `w1`–`w10` color classes. You can skip it 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `words` | `Word[]` | — | **Required.** Array of words to render. |
-| `width` | `number` | — | **Required.** Container width in px. |
+| `width` | `number \| string` | — | **Required.** Container width — a pixel number or any CSS value (e.g. `"100%"`). When a string is passed, the actual pixel width is measured via `ResizeObserver`. |
 | `height` | `number` | — | **Required.** Container height in px. |
 | `center` | `{ x: number; y: number }` | `{ x: width/2, y: height/2 }` | Starting point of the spiral. |
 | `shape` | `'elliptic' \| 'rectangular'` | `'elliptic'` | Spiral shape. |
@@ -231,6 +232,22 @@ const [ready, setReady] = useState(false);
 ```
 
 When `wordDelay` is set, `afterCloudRender` fires after the **last word** is revealed, not immediately after layout.
+
+### Fluid / responsive width
+
+Pass any CSS string (e.g. `"100%"`) to `width`. The component attaches a `ResizeObserver` to its container and re-runs the layout whenever the measured pixel width changes.
+
+```tsx
+<div style={{ width: '60%' }}>
+  <ReactJQCloud
+    words={words}
+    width="100%"
+    height={320}
+  />
+</div>
+```
+
+The cloud will re-layout automatically when the container is resized.
 
 ### Async data loading pattern
 

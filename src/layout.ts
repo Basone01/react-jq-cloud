@@ -1,4 +1,4 @@
-import type { Word } from './types';
+import type { Word } from "./types";
 
 export interface WordRect {
   width: number;
@@ -34,7 +34,11 @@ function overlaps(a: PlacedRect, b: PlacedRect): boolean {
 }
 
 // Returns true when any edge of `rect` falls outside the [0, width] × [0, height] canvas.
-function isOutOfBounds(rect: PlacedRect, width: number, height: number): boolean {
+function isOutOfBounds(
+  rect: PlacedRect,
+  width: number,
+  height: number,
+): boolean {
   return (
     rect.left < 0 ||
     rect.top < 0 ||
@@ -55,19 +59,20 @@ function isOutOfBounds(rect: PlacedRect, width: number, height: number): boolean
  */
 export function computeLayout(
   words: Word[],
-  rects: WordRect[],           // measured pixel dimensions for each word (parallel array)
+  rects: WordRect[], // measured pixel dimensions for each word (parallel array)
   options: {
     width: number;
     height: number;
     center: { x: number; y: number };
-    shape: 'elliptic' | 'rectangular';
+    shape: "elliptic" | "rectangular";
     removeOverflowing: boolean;
     fontSizes: [number, number]; // [minPx, maxPx]
-  }
+  },
 ): (WordPosition | null)[] {
   if (words.length === 0) return [];
 
-  const { width, height, center, shape, removeOverflowing, fontSizes } = options;
+  const { width, height, center, shape, removeOverflowing, fontSizes } =
+    options;
 
   // Aspect ratio stretches the horizontal step of the elliptic spiral so the
   // cloud fills a rectangular canvas instead of always forming a circle.
@@ -81,7 +86,7 @@ export function computeLayout(
   indexed.sort((a, b) => b.word.weight - a.word.weight);
 
   // ─── Step 2: derive weight → font size and weight → class mappings ───────
-  const weights = words.map(w => w.weight);
+  const weights = words.map((w) => w.weight);
   const minWeight = Math.min(...weights);
   const maxWeight = Math.max(...weights);
   const weightRange = maxWeight - minWeight; // 0 when all words share the same weight
@@ -90,7 +95,10 @@ export function computeLayout(
   // When all weights are equal the range is 0, so every word gets the minimum font size.
   function getFontSize(weight: number): number {
     if (weightRange === 0) return fontSizes[0];
-    return fontSizes[0] + ((weight - minWeight) / weightRange) * (fontSizes[1] - fontSizes[0]);
+    return (
+      fontSizes[0] +
+      ((weight - minWeight) / weightRange) * (fontSizes[1] - fontSizes[0])
+    );
   }
 
   // CSS class w1–w10: evenly maps the weight range onto 10 buckets.
@@ -119,7 +127,7 @@ export function computeLayout(
     let left = center.x - w / 2;
     let top = center.y - h / 2;
 
-    if (shape === 'elliptic') {
+    if (shape === "elliptic") {
       // ── Elliptic spiral ──────────────────────────────────────────────────
       // The candidate position is tested; if it collides the spiral advances.
       // `radius` grows on every iteration, `angle` alternates direction
@@ -133,7 +141,7 @@ export function computeLayout(
         const candidate: PlacedRect = { left, top, width: w, height: h };
 
         // Step 4a: collision check — test against every already-placed word.
-        const hasCollision = placed.some(p => overlaps(candidate, p));
+        const hasCollision = placed.some((p) => overlaps(candidate, p));
 
         if (!hasCollision) {
           // Step 4b: accept the position (or drop if it overflows the canvas).
@@ -156,7 +164,7 @@ export function computeLayout(
         radius += 2.0;
         angle += (i % 2 === 0 ? 1 : -1) * 2.0;
         left = center.x - w / 2 + radius * Math.cos(angle) * aspectRatio;
-        top  = center.y - h / 2 + radius * Math.sin(angle);
+        top = center.y - h / 2 + radius * Math.sin(angle);
 
         // Safety bail-out: if the spiral has expanded far beyond the canvas
         // there is no room left — mark the word as unplaceable.
@@ -168,7 +176,6 @@ export function computeLayout(
       if (!placed_flag) {
         result[index] = null;
       }
-
     } else {
       // ── Rectangular spiral ───────────────────────────────────────────────
       // Instead of polar coordinates the spiral walks along the four cardinal
@@ -177,13 +184,18 @@ export function computeLayout(
       // spiral expands proportionally to the canvas dimensions.
       let step = 18.0;
       let steps_in_direction = 0; // steps taken in the current direction
-      let quarter_turns = 0;      // total direction changes so far
-      let direction = 0;          // 0=right, 1=down, 2=left, 3=up
+      let quarter_turns = 0; // total direction changes so far
+      let direction = 0; // 0=right, 1=down, 2=left, 3=up
       const dx = [1, 0, -1, 0];
       const dy = [0, 1, 0, -1];
       // Horizontal moves (right/left) are widened by aspectRatio so the spiral
       // covers the canvas evenly rather than forming a tall narrow column.
-      const directionStepSize = [step * aspectRatio, step, step * aspectRatio, step];
+      const directionStepSize = [
+        step * aspectRatio,
+        step,
+        step * aspectRatio,
+        step,
+      ];
 
       let placed_flag = false;
 
@@ -192,7 +204,7 @@ export function computeLayout(
         const candidate: PlacedRect = { left, top, width: w, height: h };
 
         // Step 4a: collision check.
-        const hasCollision = placed.some(p => overlaps(candidate, p));
+        const hasCollision = placed.some((p) => overlaps(candidate, p));
 
         if (!hasCollision) {
           // Step 4b: accept or drop.
@@ -209,7 +221,7 @@ export function computeLayout(
         // Step 4c: advance one step in the current direction.
         steps_in_direction++;
         left += dx[direction]! * directionStepSize[direction]!;
-        top  += dy[direction]! * directionStepSize[direction]!;
+        top += dy[direction]! * directionStepSize[direction]!;
 
         // Step 4d: decide whether to turn.
         // The rectangular spiral turns after 1 step, then 1 step, then 2, 2, 3, 3, …
@@ -224,7 +236,7 @@ export function computeLayout(
 
         // Safety bail-out: stop when the spiral has made enough turns to have
         // covered an area larger than the canvas.
-        if (quarter_turns > (width + height) / step * 4) {
+        if (quarter_turns > ((width + height) / step) * 4) {
           break;
         }
       }

@@ -232,6 +232,8 @@ const allDelayWords: Word[] = [
 
 // ─── Code snippets ────────────────────────────────────────────────────────────
 
+const fluidWords: Word[] = basicWords;
+
 const SNIPPETS: Record<string, string> = {
   basic: `\
 import { ReactJQCloud } from '@basone01/react-jq-cloud';
@@ -352,6 +354,18 @@ function run() {
   height={460}
   shrinkToFit
 />`,
+
+  fluid: `\
+// Pass a CSS string like "100%" instead of a fixed number.
+// The component measures its container and re-lays out on resize.
+
+<div style={{ width: '60%' }}>
+  <ReactJQCloud
+    words={words}
+    width="100%"
+    height={320}
+  />
+</div>`,
 };
 
 // ─── Self-contained demos ─────────────────────────────────────────────────────
@@ -599,9 +613,45 @@ function ShrinkToFitDemo() {
   );
 }
 
+function FluidDemo() {
+  const [widthPct, setWidthPct] = useState(100);
+  const [cloudKey, setCloudKey] = useState(0);
+
+  function apply(pct: number) { setWidthPct(pct); setCloudKey(k => k + 1); }
+
+  return (
+    <div>
+      <div style={{ display: 'flex', gap: 16, alignItems: 'center', marginBottom: 14, flexWrap: 'wrap' }}>
+        <label style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          Container width:
+          <input type="range" min={30} max={100} step={5} value={widthPct}
+            onChange={e => apply(Number(e.target.value))} style={{ width: 140 }} />
+          <code style={{ minWidth: 40, fontSize: 13 }}>{widthPct}%</code>
+        </label>
+      </div>
+
+      <div style={{ width: `${widthPct}%`, transition: 'width 200ms ease' }}>
+        <ReactJQCloud
+          key={cloudKey}
+          words={fluidWords}
+          width="100%"
+          height={320}
+          style={{ border: '1px solid #ddd', borderRadius: 8, background: '#fafafa' }}
+        />
+      </div>
+
+      <p style={{ marginTop: 8, fontSize: 12, color: '#888' }}>
+        Drag the slider to resize the container. The cloud re-lays out automatically via{' '}
+        <code>ResizeObserver</code>.
+      </p>
+      <ShowCode code={SNIPPETS['fluid']!} />
+    </div>
+  );
+}
+
 // ─── Main App ─────────────────────────────────────────────────────────────────
 
-type DemoKey = 'basic' | 'links' | 'long' | 'fifty' | 'delay' | 'word-delay' | 'shrink';
+type DemoKey = 'basic' | 'links' | 'long' | 'fifty' | 'delay' | 'word-delay' | 'shrink' | 'fluid';
 
 const DEMOS: { key: DemoKey; label: string; words: Word[]; description: string }[] = [
   { key: 'basic',      label: 'Basic',           words: basicWords,   description: '20 words — shape toggle' },
@@ -611,6 +661,7 @@ const DEMOS: { key: DemoKey; label: string; words: Word[]; description: string }
   { key: 'delay',      label: 'Async fetch',      words: [],           description: 'Simulates async data loading: spinner while fetching, then afterCloudRender triggers a fade-in.' },
   { key: 'word-delay', label: 'Word delay',        words: [],           description: 'wordDelay prop: words appear one by one (heaviest first). Drag the slider to control the interval.' },
   { key: 'shrink',     label: 'Shrink to fit',    words: [],           description: 'Compare removeOverflowing vs allowOverflow vs shrinkToFit on 50 words.' },
+  { key: 'fluid',      label: 'Fluid width',       words: [],           description: 'Pass width="100%" to fill the container. A ResizeObserver re-lays out the cloud on every resize.' },
 ];
 
 export default function App() {
@@ -621,7 +672,7 @@ export default function App() {
   const [clicked, setClicked] = useState<string | null>(null);
 
   const current = DEMOS.find(d => d.key === demo)!;
-  const isSelfContained = demo === 'delay' || demo === 'word-delay' || demo === 'shrink';
+  const isSelfContained = demo === 'delay' || demo === 'word-delay' || demo === 'shrink' || demo === 'fluid';
 
   useEffect(() => {
     const id = 'rwc-spin-style';
@@ -694,6 +745,8 @@ export default function App() {
         <WordDelayDemo key="word-delay" />
       ) : demo === 'shrink' ? (
         <ShrinkToFitDemo key="shrink" />
+      ) : demo === 'fluid' ? (
+        <FluidDemo key="fluid" />
       ) : (
         <>
           <ReactJQCloud

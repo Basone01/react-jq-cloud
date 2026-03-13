@@ -11,7 +11,7 @@ export interface Word {
 
 export interface ReactJQCloudProps {
   words: Word[];
-  width: number;
+  width?: number | string;
   height: number;
   center?: { x: number; y: number };
   shape?: 'elliptic' | 'rectangular';
