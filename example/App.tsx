@@ -2,6 +2,34 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ReactJQCloud } from '../src/ReactJQCloud';
 import '../src/styles.css';
 import type { Word } from '../src/types';
+// Registers the <react-jq-cloud> custom element. Must be a bare side-effect
+// import: the class name is only used in type positions below, and a combined
+// `import { ... }` would be elided entirely by esbuild, never registering it.
+import '../src/web-component';
+import type { ReactJQCloudElement } from '../src/web-component';
+
+// Teach JSX about the custom element so it can be used in this React demo
+declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace JSX {
+    interface IntrinsicElements {
+      'react-jq-cloud': React.DetailedHTMLProps<
+        React.HTMLAttributes<HTMLElement>,
+        ReactJQCloudElement
+      > & {
+        words?: string;
+        width?: string;
+        height?: string;
+        shape?: string;
+        spacing?: string;
+        colors?: string;
+        'font-sizes'?: string;
+        'shrink-to-fit'?: string;
+        'word-delay'?: string;
+      };
+    }
+  }
+}
 
 // ─── Shared code-block component ─────────────────────────────────────────────
 
@@ -528,6 +556,37 @@ const words = [
   { text: 'React', weight: 10, color: '#e63946' },
   { text: 'TypeScript', weight: 8 },
 ];`,
+
+  'web-component': `\
+<!-- Plain HTML — no React on the page. -->
+<!-- Bundler:        import '@basone01/react-jq-cloud/web-component' -->
+<!-- Script tag:     https://unpkg.com/@basone01/react-jq-cloud/dist/web-component.global.js -->
+
+<react-jq-cloud
+  height="460"
+  shrink-to-fit
+  word-delay="40"
+  words='[
+    { "text": "React",      "weight": 10 },
+    { "text": "TypeScript", "weight": 9 },
+    { "text": "Word Cloud", "weight": 8 }
+  ]'
+></react-jq-cloud>
+
+<script>
+  const cloud = document.querySelector('react-jq-cloud');
+
+  // Rich values go through properties (they override attributes):
+  // cloud.words = await fetchWords();
+  // cloud.renderText = (word) => '#' + word.text;
+
+  cloud.addEventListener('word-click', (e) => {
+    console.log('clicked', e.detail.word.text);
+  });
+  cloud.addEventListener('cloud-render', () => {
+    console.log('cloud fully rendered');
+  });
+</script>`,
 };
 
 // ─── Self-contained demos ─────────────────────────────────────────────────────
@@ -1293,9 +1352,66 @@ function ColorsDemo() {
   );
 }
 
+// ─── Web Component Demo ───────────────────────────────────────────────────────
+
+function WebComponentDemo() {
+  const cloudRef = useRef<ReactJQCloudElement | null>(null);
+  const [lastEvent, setLastEvent] = useState<string | null>(null);
+
+  useEffect(() => {
+    const el = cloudRef.current;
+    if (!el) return;
+    const onWordClick = (e: Event) => {
+      const { word } = (e as CustomEvent<{ word: Word }>).detail;
+      setLastEvent(`word-click → "${word.text}" (weight ${word.weight})`);
+    };
+    const onCloudRender = () => {
+      setLastEvent((prev) => prev ?? 'cloud-render → layout complete');
+    };
+    el.addEventListener('word-click', onWordClick);
+    el.addEventListener('cloud-render', onCloudRender);
+    return () => {
+      el.removeEventListener('word-click', onWordClick);
+      el.removeEventListener('cloud-render', onCloudRender);
+    };
+  }, []);
+
+  return (
+    <div>
+      <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 12, minHeight: 24 }}>
+        <span style={{ fontSize: 13, color: '#555', fontWeight: 600 }}>Last CustomEvent:</span>
+        <code style={{ fontSize: 12, color: lastEvent ? '#0a0' : '#999' }}>
+          {lastEvent ?? 'click a word…'}
+        </code>
+      </div>
+
+      {/* This is the custom element, not the React component — the cloud below
+          is rendered by the element's own embedded React root. */}
+      <react-jq-cloud
+        ref={cloudRef}
+        words={JSON.stringify(basicWords)}
+        width="100%"
+        height="460"
+        shrink-to-fit=""
+        word-delay="40"
+        style={{ border: '1px solid #ddd', borderRadius: 8, background: '#fafafa' }}
+      ></react-jq-cloud>
+
+      <p style={{ marginTop: 8, fontSize: 12, color: '#888' }}>
+        The cloud above is a <code>&lt;react-jq-cloud&gt;</code> custom element — usable from plain
+        HTML, Vue, Svelte, or Angular with React bundled in. Configure via attributes
+        (<code>words</code> as JSON, <code>shrink-to-fit</code>, …), assign rich values via
+        properties (<code>el.words = [...]</code>), and listen to <code>word-click</code>,{' '}
+        <code>word-reveal</code>, and <code>cloud-render</code> CustomEvents.
+      </p>
+      <ShowCode code={SNIPPETS['web-component']!} />
+    </div>
+  );
+}
+
 // ─── Main App ─────────────────────────────────────────────────────────────────
 
-type DemoKey = 'basic' | 'links' | 'long' | 'fifty' | 'delay' | 'word-delay' | 'shrink' | 'fluid' | 'html' | 'tooltip' | 'hashtag' | 'spacing' | 'overflow' | 'colors' | 'playground';
+type DemoKey = 'basic' | 'links' | 'long' | 'fifty' | 'delay' | 'word-delay' | 'shrink' | 'fluid' | 'html' | 'tooltip' | 'hashtag' | 'spacing' | 'overflow' | 'colors' | 'web-component' | 'playground';
 
 const DEMOS: { key: DemoKey; label: string; words: Word[]; description: string }[] = [
   { key: 'basic',      label: 'Basic',           words: basicWords,   description: '20 words — shape toggle' },
@@ -1312,6 +1428,7 @@ const DEMOS: { key: DemoKey; label: string; words: Word[]; description: string }
   { key: 'spacing',    label: 'Spacing',           words: [],           description: '50 words — drag the slider to add breathing room between words via the spacing prop.' },
   { key: 'overflow',    label: 'Wrap / Ellipsis',   words: [],           description: 'wrapAtPercent and ellipsisAtPercent props: constrain long words to a max percentage of the container width.' },
   { key: 'colors',     label: 'Custom colors',     words: [],           description: 'colors prop: supply a 10-element palette mapped to weight classes w1–w10. Switch between preset palettes.' },
+  { key: 'web-component', label: 'Web component',  words: [],           description: 'The <react-jq-cloud> custom element — framework-agnostic, configured via attributes, with CustomEvent callbacks. React is bundled in.' },
   { key: 'playground', label: '🛝 Playground',      words: [],           description: 'Live playground — toggle every prop and switch datasets (incl. Thai). Generates code as you go.' },
 ];
 
@@ -1323,7 +1440,7 @@ export default function App() {
   const [clicked, setClicked] = useState<string | null>(null);
 
   const current = DEMOS.find(d => d.key === demo)!;
-  const isSelfContained = demo === 'delay' || demo === 'word-delay' || demo === 'shrink' || demo === 'fluid' || demo === 'html' || demo === 'tooltip' || demo === 'hashtag' || demo === 'spacing' || demo === 'overflow' || demo === 'colors' || demo === 'playground';
+  const isSelfContained = demo === 'delay' || demo === 'word-delay' || demo === 'shrink' || demo === 'fluid' || demo === 'html' || demo === 'tooltip' || demo === 'hashtag' || demo === 'spacing' || demo === 'overflow' || demo === 'colors' || demo === 'web-component' || demo === 'playground';
 
   useEffect(() => {
     const id = 'rwc-spin-style';
@@ -1423,6 +1540,8 @@ export default function App() {
         <OverflowDemo key="overflow" />
       ) : demo === 'colors' ? (
         <ColorsDemo key="colors" />
+      ) : demo === 'web-component' ? (
+        <WebComponentDemo key="web-component" />
       ) : demo === 'playground' ? (
         <PlaygroundDemo key="playground" />
       ) : (
