@@ -23,8 +23,14 @@ declare global {
         shape?: string;
         spacing?: string;
         colors?: string;
+        'font-family'?: string;
         'font-sizes'?: string;
         'shrink-to-fit'?: string;
+        'remove-overflowing'?: string;
+        'wrap-at-percent'?: string;
+        'ellipsis-at-percent'?: string;
+        'wrap-at-percent-on-limit'?: string;
+        'ellipsis-at-percent-on-limit'?: string;
         'word-delay'?: string;
       };
     }
@@ -556,37 +562,6 @@ const words = [
   { text: 'React', weight: 10, color: '#e63946' },
   { text: 'TypeScript', weight: 8 },
 ];`,
-
-  'web-component': `\
-<!-- Plain HTML — no React on the page. -->
-<!-- Bundler:        import '@basone01/react-jq-cloud/web-component' -->
-<!-- Script tag:     https://unpkg.com/@basone01/react-jq-cloud/dist/web-component.global.js -->
-
-<react-jq-cloud
-  height="460"
-  shrink-to-fit
-  word-delay="40"
-  words='[
-    { "text": "React",      "weight": 10 },
-    { "text": "TypeScript", "weight": 9 },
-    { "text": "Word Cloud", "weight": 8 }
-  ]'
-></react-jq-cloud>
-
-<script>
-  const cloud = document.querySelector('react-jq-cloud');
-
-  // Rich values go through properties (they override attributes):
-  // cloud.words = await fetchWords();
-  // cloud.renderText = (word) => '#' + word.text;
-
-  cloud.addEventListener('word-click', (e) => {
-    console.log('clicked', e.detail.word.text);
-  });
-  cloud.addEventListener('cloud-render', () => {
-    console.log('cloud fully rendered');
-  });
-</script>`,
 };
 
 // ─── Self-contained demos ─────────────────────────────────────────────────────
@@ -1354,57 +1329,387 @@ function ColorsDemo() {
 
 // ─── Web Component Demo ───────────────────────────────────────────────────────
 
-function WebComponentDemo() {
+const WC_CLOUD_STYLE: React.CSSProperties = {
+  border: '1px solid #ddd', borderRadius: 8, background: '#fafafa',
+};
+
+const WC_SNIPPETS: Record<string, string> = {
+  load: `\
+<!-- Bundler -->
+<script type="module">
+  import '@basone01/react-jq-cloud/web-component';
+</script>
+
+<!-- Or a plain script tag — no build step, React bundled in.
+     In production, pin a version and add an integrity hash. -->
+<script src="https://unpkg.com/@basone01/react-jq-cloud/dist/web-component.global.js"></script>
+
+<react-jq-cloud
+  height="360"
+  words='[
+    { "text": "React",      "weight": 10 },
+    { "text": "TypeScript", "weight": 9 },
+    { "text": "Word Cloud", "weight": 8 }
+  ]'
+></react-jq-cloud>`,
+
+  layout: `\
+<!-- width:      number (px) or any CSS length (default "100%")
+     height:     px (default 400)
+     shape:      "elliptic" (default) | "rectangular"
+     spacing:    extra collision padding around each word, in px
+     font-sizes: "min,max" font size in px -->
+
+<react-jq-cloud
+  width="100%"
+  height="360"
+  shape="rectangular"
+  spacing="8"
+  font-sizes="10,44"
+  words='[…]'
+></react-jq-cloud>`,
+
+  theming: `\
+<!-- colors: 10 entries mapped to weight classes w1 (lightest) → w10 (heaviest);
+     comma-separated or JSON array. font-family: any CSS font stack. -->
+
+<react-jq-cloud
+  height="320"
+  font-family="Georgia, 'Times New Roman', serif"
+  colors="#fde68a,#fcd34d,#fbbf24,#f59e0b,#d97706,#b45309,#92400e,#78350f,#6b21a8,#4c1d95"
+  words='[…]'
+></react-jq-cloud>
+
+<!-- A per-word color always wins:
+     { "text": "React", "weight": 10, "color": "#e63946" } -->`,
+
+  overflow: `\
+<!-- wrap-at-percent: words wider than N% of the container wrap onto
+     multiple lines. ellipsis-at-percent: truncate with "…" instead.
+     remove-overflowing="false": keep words even when they poke outside. -->
+
+<react-jq-cloud height="300" wrap-at-percent="22"     words='[…]'></react-jq-cloud>
+<react-jq-cloud height="300" ellipsis-at-percent="22" words='[…]'></react-jq-cloud>
+<react-jq-cloud height="300" remove-overflowing="false" words='[…]'></react-jq-cloud>`,
+
+  shrink: `\
+<!-- shrink-to-fit scales every font down (to ×0.3 of the original) until
+     all words fit. The *-on-limit attributes only activate when that
+     minimum scale still isn't enough — here very long Thai phrases start
+     wrapping at 30% width instead of being dropped. -->
+
+<react-jq-cloud
+  height="380"
+  shrink-to-fit
+  wrap-at-percent-on-limit="30"
+  words='[… 50 long Thai phrases …]'
+></react-jq-cloud>
+
+<!-- ellipsis-at-percent-on-limit="30" truncates instead of wrapping -->`,
+
+  events: `\
+<react-jq-cloud id="cloud" height="360" word-delay="60" words='[…]'></react-jq-cloud>
+
+<script>
+  const cloud = document.getElementById('cloud');
+
+  cloud.addEventListener('word-click', (e) => {
+    console.log(e.detail.word);                      // { text, weight, … }
+  });
+  cloud.addEventListener('word-reveal', (e) => {     // fires per revealed word
+    console.log(e.detail.revealed, '/', e.detail.total);
+  });
+  cloud.addEventListener('cloud-render', () => {     // layout + reveal done
+    console.log('all words visible');
+  });
+</script>`,
+
+  properties: `\
+<script>
+  const cloud = document.querySelector('react-jq-cloud');
+
+  // Rich values don't fit in attributes — assign properties instead.
+  // A property always takes precedence over its attribute.
+  cloud.words     = await fetch('/api/words').then(r => r.json());
+  cloud.colors    = ['#fde68a', '#fcd34d', /* … 10 entries … */];
+  cloud.fontSizes = [10, 48];
+
+  // Functions are property-only:
+  cloud.renderText    = (word) => '#' + word.text;
+  cloud.renderTooltip = (word) => word.text + ' — weight ' + word.weight;
+</script>`,
+};
+
+const WC_ATTRIBUTE_ROWS: [string, string, string][] = [
+  ['words', '\'[{"text":"React","weight":10}]\'', 'Word list as a JSON string (or assign el.words)'],
+  ['width', '"100%" or "740"', 'CSS length or px number; default 100%'],
+  ['height', '"460"', 'Height in px; default 400'],
+  ['shape', '"rectangular"', 'Spiral shape; default elliptic'],
+  ['spacing', '"8"', 'Extra collision padding around each word (px)'],
+  ['font-sizes', '"12,60"', 'min,max font size in px'],
+  ['colors', '"#aab5f0,#99ccee,…"', '10 colors for weight classes w1–w10'],
+  ['font-family', '"Georgia, serif"', 'Font stack applied to every word'],
+  ['shrink-to-fit', '(boolean)', 'Scale fonts down until every word fits'],
+  ['remove-overflowing', '"false"', 'Keep words that overflow the canvas'],
+  ['wrap-at-percent', '"22"', 'Wrap words wider than N% of the container'],
+  ['ellipsis-at-percent', '"22"', 'Truncate words wider than N% with "…"'],
+  ['wrap-at-percent-on-limit', '"30"', 'Wrap fallback once shrink-to-fit hits min scale'],
+  ['ellipsis-at-percent-on-limit', '"30"', 'Ellipsis fallback once shrink-to-fit hits min scale'],
+  ['word-delay', '"60"', 'Milliseconds between word reveals'],
+];
+
+const WC_EVENT_ROWS: [string, string, string][] = [
+  ['word-click', 'e.detail.word', 'A word was clicked'],
+  ['word-reveal', 'e.detail.revealed, e.detail.total', 'Fires for every revealed word (with word-delay)'],
+  ['cloud-render', '—', 'Layout finished and all words are visible'],
+];
+
+function WcReferenceTable({ caption, head, rows }: { caption: string; head: [string, string, string]; rows: [string, string, string][] }) {
+  const cell: React.CSSProperties = { padding: '5px 10px', borderBottom: '1px solid #eee', fontSize: 12, textAlign: 'left', verticalAlign: 'top' };
+  return (
+    <div style={{ marginBottom: 20 }}>
+      <p style={{ margin: '0 0 6px', fontSize: 13, fontWeight: 600, color: '#444' }}>{caption}</p>
+      <table style={{ borderCollapse: 'collapse', width: '100%', border: '1px solid #eee', borderRadius: 6 }}>
+        <thead>
+          <tr style={{ background: '#f6f8fa' }}>
+            {head.map(h => <th key={h} style={{ ...cell, fontWeight: 600 }}>{h}</th>)}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map(([a, b, c]) => (
+            <tr key={a}>
+              <td style={cell}><code>{a}</code></td>
+              <td style={cell}><code style={{ color: '#0550ae' }}>{b}</code></td>
+              <td style={cell}>{c}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function WcSection({ title, blurb, children }: { title: string; blurb: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <section style={{ margin: '0 0 40px' }}>
+      <h3 style={{ margin: '0 0 6px', fontSize: 16 }}>{title}</h3>
+      <p style={{ margin: '0 0 12px', fontSize: 13, color: '#555' }}>{blurb}</p>
+      {children}
+    </section>
+  );
+}
+
+function WcEventLog({ entries }: { entries: string[] }) {
+  return (
+    <div style={{
+      fontFamily: 'monospace', fontSize: 12, background: '#111', color: '#0f0',
+      borderRadius: 6, padding: '8px 12px', marginBottom: 12, lineHeight: 1.7, minHeight: 60,
+    }}>
+      {entries.length === 0
+        ? <span style={{ color: '#666' }}>waiting for events… (click a word)</span>
+        : entries.map((entry, i) => <div key={i}>{entry}</div>)}
+    </div>
+  );
+}
+
+// Live demo of all three CustomEvents, with a replay button (remounts the element)
+function WcEventsSection() {
   const cloudRef = useRef<ReactJQCloudElement | null>(null);
-  const [lastEvent, setLastEvent] = useState<string | null>(null);
+  const [cloudKey, setCloudKey] = useState(0);
+  const [log, setLog] = useState<string[]>([]);
 
   useEffect(() => {
     const el = cloudRef.current;
     if (!el) return;
-    const onWordClick = (e: Event) => {
-      const { word } = (e as CustomEvent<{ word: Word }>).detail;
-      setLastEvent(`word-click → "${word.text}" (weight ${word.weight})`);
+    const push = (msg: string) => setLog(prev => [...prev.slice(-7), msg]);
+    const onClick = (e: Event) =>
+      push(`word-click   → "${(e as CustomEvent<{ word: Word }>).detail.word.text}"`);
+    const onReveal = (e: Event) => {
+      const { revealed, total } = (e as CustomEvent<{ revealed: number; total: number }>).detail;
+      push(`word-reveal  → ${revealed} / ${total}`);
     };
-    const onCloudRender = () => {
-      setLastEvent((prev) => prev ?? 'cloud-render → layout complete');
-    };
-    el.addEventListener('word-click', onWordClick);
-    el.addEventListener('cloud-render', onCloudRender);
+    const onRender = () => push('cloud-render → all words visible');
+    el.addEventListener('word-click', onClick);
+    el.addEventListener('word-reveal', onReveal);
+    el.addEventListener('cloud-render', onRender);
     return () => {
-      el.removeEventListener('word-click', onWordClick);
-      el.removeEventListener('cloud-render', onCloudRender);
+      el.removeEventListener('word-click', onClick);
+      el.removeEventListener('word-reveal', onReveal);
+      el.removeEventListener('cloud-render', onRender);
     };
-  }, []);
+  }, [cloudKey]);
 
   return (
-    <div>
-      <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 12, minHeight: 24 }}>
-        <span style={{ fontSize: 13, color: '#555', fontWeight: 600 }}>Last CustomEvent:</span>
-        <code style={{ fontSize: 12, color: lastEvent ? '#0a0' : '#999' }}>
-          {lastEvent ?? 'click a word…'}
-        </code>
-      </div>
+    <WcSection
+      title="Events"
+      blurb={<>All callbacks surface as bubbling <code>CustomEvent</code>s. <code>word-delay="60"</code> makes the <code>word-reveal</code> stream visible below — click any word for <code>word-click</code>.</>}
+    >
+      <button
+        onClick={() => { setCloudKey(k => k + 1); setLog([]); }}
+        style={{ padding: '5px 14px', borderRadius: 6, border: '1px solid #ccc', cursor: 'pointer', background: '#fff', marginBottom: 10 }}
+      >↺ Replay</button>
+      <WcEventLog entries={log} />
+      <react-jq-cloud
+        key={cloudKey}
+        ref={cloudRef}
+        height="360"
+        word-delay="60"
+        words={JSON.stringify(allDelayWords)}
+        style={WC_CLOUD_STYLE}
+      ></react-jq-cloud>
+      <ShowCode code={WC_SNIPPETS['events']!} />
+    </WcSection>
+  );
+}
 
-      {/* This is the custom element, not the React component — the cloud below
-          is rendered by the element's own embedded React root. */}
+// Live demo of property assignment (words / renderText / renderTooltip)
+function WcPropertiesSection() {
+  const cloudRef = useRef<ReactJQCloudElement | null>(null);
+  const [propWords, setPropWords] = useState(false);
+  const [hashtag, setHashtag] = useState(false);
+
+  // Functions can only be passed as properties — set a tooltip on mount.
+  useEffect(() => {
+    const el = cloudRef.current;
+    if (!el) return;
+    el.renderTooltip = (word) => (
+      <div style={{
+        background: '#1e1e2e', color: '#cdd6f4', padding: '5px 10px', borderRadius: 6,
+        fontSize: 12, marginBottom: 6, whiteSpace: 'nowrap',
+      }}>
+        {word.text} — weight {word.weight}
+      </div>
+    );
+  }, []);
+
+  function assignWords() {
+    cloudRef.current!.words = fiftyWords; // property overrides the words attribute
+    setPropWords(true);
+  }
+
+  function toggleHashtag() {
+    const next = !hashtag;
+    cloudRef.current!.renderText = next ? (word) => `#${word.text}` : undefined;
+    setHashtag(next);
+  }
+
+  return (
+    <WcSection
+      title="Properties — rich values & functions"
+      blurb={<>Attributes are strings, so arrays and functions go through DOM <em>properties</em>: <code>words</code>, <code>colors</code>, <code>fontSizes</code>, <code>renderText</code>, <code>renderTooltip</code>. A property always overrides its attribute. This cloud starts from a <code>words</code> attribute and has a <code>renderTooltip</code> set on load — hover any word.</>}
+    >
+      <div style={{ display: 'flex', gap: 10, marginBottom: 12, flexWrap: 'wrap' }}>
+        <button
+          onClick={assignWords}
+          disabled={propWords}
+          style={{ padding: '5px 14px', borderRadius: 6, border: '1px solid #ccc', cursor: propWords ? 'not-allowed' : 'pointer', background: '#fff', opacity: propWords ? 0.5 : 1 }}
+        >{propWords ? 'words property assigned ✓' : 'cloud.words = fiftyWords'}</button>
+        <button
+          onClick={toggleHashtag}
+          style={{ padding: '5px 14px', borderRadius: 6, border: '1px solid #ccc', cursor: 'pointer', background: hashtag ? '#0070f3' : '#fff', color: hashtag ? '#fff' : '#333' }}
+        >cloud.renderText = w =&gt; '#' + w.text</button>
+      </div>
       <react-jq-cloud
         ref={cloudRef}
+        height="360"
         words={JSON.stringify(basicWords)}
-        width="100%"
-        height="460"
-        shrink-to-fit=""
-        word-delay="40"
-        style={{ border: '1px solid #ddd', borderRadius: 8, background: '#fafafa' }}
+        style={WC_CLOUD_STYLE}
       ></react-jq-cloud>
+      <ShowCode code={WC_SNIPPETS['properties']!} />
+    </WcSection>
+  );
+}
 
-      <p style={{ marginTop: 8, fontSize: 12, color: '#888' }}>
-        The cloud above is a <code>&lt;react-jq-cloud&gt;</code> custom element — usable from plain
-        HTML, Vue, Svelte, or Angular with React bundled in. Configure via attributes
-        (<code>words</code> as JSON, <code>shrink-to-fit</code>, …), assign rich values via
-        properties (<code>el.words = [...]</code>), and listen to <code>word-click</code>,{' '}
-        <code>word-reveal</code>, and <code>cloud-render</code> CustomEvents.
-      </p>
-      <ShowCode code={SNIPPETS['web-component']!} />
+function WebComponentDemo() {
+  return (
+    <div>
+      {/* Reference tables */}
+      <WcReferenceTable caption="Attributes" head={['Attribute', 'Example', 'Description']} rows={WC_ATTRIBUTE_ROWS} />
+      <WcReferenceTable caption="Events (bubbling CustomEvents)" head={['Event', 'Detail', 'Fires when']} rows={WC_EVENT_ROWS} />
+
+      <WcSection
+        title="Quick start"
+        blurb={<>Load the module (bundler import or plain script tag), then drop the tag anywhere. <code>words</code> is a JSON attribute; <code>width</code> defaults to <code>100%</code> and <code>height</code> to <code>400</code>.</>}
+      >
+        <react-jq-cloud
+          height="360"
+          words={JSON.stringify(basicWords)}
+          style={WC_CLOUD_STYLE}
+        ></react-jq-cloud>
+        <ShowCode code={WC_SNIPPETS['load']!} />
+      </WcSection>
+
+      <WcSection
+        title="Layout — width, height, shape, spacing, font-sizes"
+        blurb={<>A rectangular spiral with <code>spacing="8"</code> breathing room and a tighter <code>font-sizes="10,44"</code> range, on the 50-word dataset.</>}
+      >
+        <react-jq-cloud
+          width="100%"
+          height="360"
+          shape="rectangular"
+          spacing="8"
+          font-sizes="10,44"
+          words={JSON.stringify(fiftyWords)}
+          style={WC_CLOUD_STYLE}
+        ></react-jq-cloud>
+        <ShowCode code={WC_SNIPPETS['layout']!} />
+      </WcSection>
+
+      <WcSection
+        title="Theming — colors, font-family"
+        blurb={<>The sunset palette as a comma-separated <code>colors</code> attribute (w1 lightest → w10 heaviest) and a serif <code>font-family</code>. Per-word <code>color</code> fields still win.</>}
+      >
+        <react-jq-cloud
+          height="320"
+          font-family="Georgia, 'Times New Roman', serif"
+          colors={PALETTES[0]!.colors.join(',')}
+          words={JSON.stringify(basicWords)}
+          style={WC_CLOUD_STYLE}
+        ></react-jq-cloud>
+        <ShowCode code={WC_SNIPPETS['theming']!} />
+      </WcSection>
+
+      <WcSection
+        title="Overflow — wrap-at-percent, ellipsis-at-percent, remove-overflowing"
+        blurb={<>The same long-word dataset three ways: wrapped at 22% of the container width, truncated with an ellipsis, and unconstrained with <code>remove-overflowing="false"</code> (words may poke outside).</>}
+      >
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 12 }}>
+          {([
+            ['wrap-at-percent="22"', { 'wrap-at-percent': '22' }],
+            ['ellipsis-at-percent="22"', { 'ellipsis-at-percent': '22' }],
+            ['remove-overflowing="false"', { 'remove-overflowing': 'false' }],
+          ] as const).map(([label, attrs]) => (
+            <div key={label}>
+              <code style={{ fontSize: 12, color: '#555' }}>{label}</code>
+              <react-jq-cloud
+                height="280"
+                font-sizes="10,36"
+                words={JSON.stringify(longWords)}
+                style={{ ...WC_CLOUD_STYLE, marginTop: 6 }}
+                {...attrs}
+              ></react-jq-cloud>
+            </div>
+          ))}
+        </div>
+        <ShowCode code={WC_SNIPPETS['overflow']!} />
+      </WcSection>
+
+      <WcSection
+        title="Fit — shrink-to-fit with on-limit fallbacks"
+        blurb={<>50 long Thai phrases: <code>shrink-to-fit</code> scales fonts down until everything fits, and <code>wrap-at-percent-on-limit="30"</code> starts wrapping the longest phrases only if the minimum scale (×0.3) still isn't enough.</>}
+      >
+        <react-jq-cloud
+          height="380"
+          shrink-to-fit=""
+          wrap-at-percent-on-limit="30"
+          words={JSON.stringify(thaiWords)}
+          style={WC_CLOUD_STYLE}
+        ></react-jq-cloud>
+        <ShowCode code={WC_SNIPPETS['shrink']!} />
+      </WcSection>
+
+      <WcEventsSection />
+      <WcPropertiesSection />
     </div>
   );
 }
