@@ -392,7 +392,7 @@ The package ships a self-contained `<react-jq-cloud>` custom element with React 
 
 <!-- Or via a plain script tag (exposes window.ReactJQCloudWC).
      Pin a version, and consider adding an integrity hash in production. -->
-<script src="https://unpkg.com/@basone01/react-jq-cloud@0.9.6/dist/web-component.global.js"></script>
+<script src="https://unpkg.com/@basone01/react-jq-cloud@0.10.0/dist/web-component.global.js"></script>
 
 <react-jq-cloud
   height="400"
