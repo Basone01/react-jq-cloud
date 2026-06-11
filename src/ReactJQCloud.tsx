@@ -69,6 +69,34 @@ export function ReactJQCloud({
     return () => observer.disconnect();
   }, [width]);
 
+  // Bumped when web fonts finish loading after mount. The initial measurement
+  // pass may run with fallback-font metrics; when the real font swaps in, every
+  // span changes size and the computed positions are no longer collision-free,
+  // so layout must re-run once with the final glyph metrics.
+  const [fontLoadCount, setFontLoadCount] = useState(0);
+
+  useEffect(() => {
+    const fonts = typeof document !== "undefined" ? document.fonts : undefined;
+    if (!fonts) return; // SSR / test environments without the FontFaceSet API
+    let cancelled = false;
+    const relayout = () => {
+      if (!cancelled) setFontLoadCount((c) => c + 1);
+    };
+    if (fonts.status === "loading") {
+      fonts.ready.then(relayout);
+      return () => {
+        cancelled = true;
+      };
+    }
+    // Fonts referenced by this cloud may only start loading once its spans
+    // first render — catch the first load that completes after mount.
+    fonts.addEventListener("loadingdone", relayout, { once: true });
+    return () => {
+      cancelled = true;
+      fonts.removeEventListener("loadingdone", relayout);
+    };
+  }, []);
+
   const resolvedCenter = center ?? { x: layoutWidth / 2, y: height / 2 };
 
   const weights = words.map((w) => w.weight);
@@ -120,6 +148,15 @@ export function ReactJQCloud({
     shrinkToFit,
     fontSizes[0],
     fontSizes[1],
+    fontLoadCount,
+    removeOverflowing,
+    fontFamily,
+    wrapAtPercent,
+    ellipsisAtPercent,
+    wrapAtPercentOnLimit,
+    ellipsisAtPercentOnLimit,
+    center?.x,
+    center?.y,
   ]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Pass 1: measure spans → compute layout

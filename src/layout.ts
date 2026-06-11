@@ -53,9 +53,13 @@ function isOutOfBounds(
  * Receives pre-measured word dimensions (`rects`) and places each word on the
  * canvas by spiralling outward from `center` until a collision-free position is
  * found.  Returns one `WordPosition` per input word (same order), or `null` when
- * a word was dropped because it overflowed the canvas with `removeOverflowing` on.
+ * `removeOverflowing` is on and no collision-free in-bounds position exists.
  *
- * Ported from jQCloud (https://github.com/lucaong/jQCloud).
+ * Ported from jQCloud (https://github.com/lucaong/jQCloud), with one deviation:
+ * jQCloud dropped a word as soon as its first collision-free spot overflowed
+ * the canvas; here an overflowing spot is treated like a collision and the
+ * spiral keeps searching, so words are only dropped when the canvas is
+ * genuinely full. This keeps shrinkToFit from over-shrinking the cloud.
  */
 export function computeLayout(
   words: Word[],
@@ -138,27 +142,25 @@ export function computeLayout(
       // (odd-indexed words go counter-clockwise) to fill both sides evenly.
       let radius = 0;
       let angle = 0;
-      let placed_flag = false;
 
       // eslint-disable-next-line no-constant-condition
       while (true) {
         // Padded rect for collision/bounds checks; render rect uses left/top/w/h.
         const candidate: PlacedRect = { left: left - spacing, top: top - spacing, width: pw, height: ph };
 
-        // Step 4a: collision check — test against every already-placed word.
-        const hasCollision = placed.some((p) => overlaps(candidate, p));
+        // Step 4a: a spot is usable when it is collision-free and, with
+        // removeOverflowing on, fully inside the canvas. An out-of-bounds spot
+        // counts as a collision so the spiral keeps searching the remaining
+        // in-bounds gaps instead of dropping the word at the first overflow.
+        const usable =
+          !placed.some((p) => overlaps(candidate, p)) &&
+          (!removeOverflowing || !isOutOfBounds(candidate, width, height));
 
-        if (!hasCollision) {
-          // Step 4b: accept the position (or drop if it overflows the canvas).
-          if (removeOverflowing && isOutOfBounds(candidate, width, height)) {
-            // Word falls (at least partially) outside the canvas — discard it.
-            result[index] = null;
-          } else {
-            result[index] = { left, top, fontSize, weightClass };
-            // Register this word's padded bounding box so future words avoid it.
-            placed.push(candidate);
-          }
-          placed_flag = true;
+        if (usable) {
+          // Step 4b: accept the position.
+          result[index] = { left, top, fontSize, weightClass };
+          // Register this word's padded bounding box so future words avoid it.
+          placed.push(candidate);
           break;
         }
 
@@ -172,14 +174,11 @@ export function computeLayout(
         top = center.y - h / 2 + radius * Math.sin(angle);
 
         // Safety bail-out: if the spiral has expanded far beyond the canvas
-        // there is no room left — mark the word as unplaceable.
+        // there is no room left — the word stays unplaced (`result[index]`
+        // keeps its pre-filled null).
         if (radius > Math.max(width, height) * 2) {
           break;
         }
-      }
-
-      if (!placed_flag) {
-        result[index] = null;
       }
     } else {
       // ── Rectangular spiral ───────────────────────────────────────────────
@@ -202,24 +201,21 @@ export function computeLayout(
         step,
       ];
 
-      let placed_flag = false;
-
       // eslint-disable-next-line no-constant-condition
       while (true) {
         const candidate: PlacedRect = { left: left - spacing, top: top - spacing, width: pw, height: ph };
 
-        // Step 4a: collision check.
-        const hasCollision = placed.some((p) => overlaps(candidate, p));
+        // Step 4a: usable = collision-free and (with removeOverflowing on)
+        // inside the canvas — same out-of-bounds-as-collision rule as the
+        // elliptic spiral above.
+        const usable =
+          !placed.some((p) => overlaps(candidate, p)) &&
+          (!removeOverflowing || !isOutOfBounds(candidate, width, height));
 
-        if (!hasCollision) {
-          // Step 4b: accept or drop.
-          if (removeOverflowing && isOutOfBounds(candidate, width, height)) {
-            result[index] = null;
-          } else {
-            result[index] = { left, top, fontSize, weightClass };
-            placed.push(candidate);
-          }
-          placed_flag = true;
+        if (usable) {
+          // Step 4b: accept the position.
+          result[index] = { left, top, fontSize, weightClass };
+          placed.push(candidate);
           break;
         }
 
@@ -240,14 +236,11 @@ export function computeLayout(
         }
 
         // Safety bail-out: stop when the spiral has made enough turns to have
-        // covered an area larger than the canvas.
+        // covered an area larger than the canvas — the word stays unplaced
+        // (`result[index]` keeps its pre-filled null).
         if (quarter_turns > ((width + height) / step) * 4) {
           break;
         }
-      }
-
-      if (!placed_flag) {
-        result[index] = null;
       }
     }
   }

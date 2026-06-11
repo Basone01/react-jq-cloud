@@ -393,6 +393,124 @@ describe('ReactJQCloud', () => {
     });
   });
 
+  // ── re-layout on prop changes that affect rendered word size ─────────────
+
+  describe('re-layout on prop change', () => {
+    beforeEach(() => {
+      vi.mocked(layoutModule.computeLayout).mockReturnValue(mockPositions);
+      mockRafSync();
+    });
+
+    it('re-runs layout when wrapAtPercent changes', async () => {
+      let rerender!: (ui: React.ReactElement) => void;
+      await act(async () => {
+        ({ rerender } = render(
+          <ReactJQCloud words={words} width={600} height={400} wrapAtPercent={20} />,
+        ));
+      });
+      const callsAfterMount = vi.mocked(layoutModule.computeLayout).mock.calls.length;
+
+      await act(async () => {
+        rerender(
+          <ReactJQCloud words={words} width={600} height={400} wrapAtPercent={40} />,
+        );
+      });
+      expect(vi.mocked(layoutModule.computeLayout).mock.calls.length).toBeGreaterThan(
+        callsAfterMount,
+      );
+    });
+
+    it('re-runs layout when fontFamily changes', async () => {
+      let rerender!: (ui: React.ReactElement) => void;
+      await act(async () => {
+        ({ rerender } = render(
+          <ReactJQCloud words={words} width={600} height={400} fontFamily="Georgia" />,
+        ));
+      });
+      const callsAfterMount = vi.mocked(layoutModule.computeLayout).mock.calls.length;
+
+      await act(async () => {
+        rerender(
+          <ReactJQCloud words={words} width={600} height={400} fontFamily="Verdana" />,
+        );
+      });
+      expect(vi.mocked(layoutModule.computeLayout).mock.calls.length).toBeGreaterThan(
+        callsAfterMount,
+      );
+    });
+  });
+
+  // ── re-layout when web fonts load after the initial measurement ──────────
+
+  describe('font loading', () => {
+    beforeEach(() => {
+      vi.mocked(layoutModule.computeLayout).mockReturnValue(mockPositions);
+      mockRafSync();
+    });
+
+    afterEach(() => {
+      // jsdom has no document.fonts; remove the stub we installed
+      delete (document as { fonts?: unknown }).fonts;
+    });
+
+    function stubFonts(fonts: object) {
+      Object.defineProperty(document, 'fonts', {
+        value: fonts,
+        configurable: true,
+        writable: true,
+      });
+    }
+
+    it('re-runs layout when a font load completes after mount', async () => {
+      const listeners: EventListener[] = [];
+      stubFonts({
+        status: 'loaded',
+        ready: Promise.resolve(),
+        addEventListener: (type: string, cb: EventListener) => {
+          if (type === 'loadingdone') listeners.push(cb);
+        },
+        removeEventListener: vi.fn(),
+      });
+
+      await act(async () => {
+        render(<ReactJQCloud words={words} width={600} height={400} />);
+      });
+      const callsAfterMount = vi.mocked(layoutModule.computeLayout).mock.calls.length;
+      expect(listeners.length).toBeGreaterThan(0);
+
+      await act(async () => {
+        listeners.forEach((cb) => cb(new Event('loadingdone')));
+      });
+      expect(vi.mocked(layoutModule.computeLayout).mock.calls.length).toBeGreaterThan(
+        callsAfterMount,
+      );
+    });
+
+    it('re-runs layout via fonts.ready when fonts are loading at mount', async () => {
+      let resolveReady!: () => void;
+      stubFonts({
+        status: 'loading',
+        ready: new Promise<void>((r) => {
+          resolveReady = r;
+        }),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      });
+
+      await act(async () => {
+        render(<ReactJQCloud words={words} width={600} height={400} />);
+      });
+      const callsAfterMount = vi.mocked(layoutModule.computeLayout).mock.calls.length;
+
+      await act(async () => {
+        resolveReady();
+      });
+      expect(vi.mocked(layoutModule.computeLayout).mock.calls.length).toBeGreaterThan(
+        callsAfterMount,
+      );
+    });
+  });
+
   // ── wordDelay staggered reveal ───────────────────────────────────────────
 
   describe('wordDelay', () => {
