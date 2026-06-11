@@ -382,7 +382,7 @@ function MyCloud() {
 
 ## Web component (no React required)
 
-The package ships a self-contained `<react-jq-cloud>` custom element with React bundled in, so the cloud can be used from plain HTML or any framework (Vue, Svelte, Angular, …).
+The package ships a self-contained `<react-jq-cloud>` custom element, so the cloud can be used from plain HTML or any framework (Vue, Svelte, Angular, …). The build bundles a lightweight React-compatible runtime ([preact/compat](https://preactjs.com/guide/v10/switching-to-preact/), ~29 KB minified / ~11 KB gzipped) — the host page needs no framework and no build step.
 
 ```html
 <!-- Via a bundler -->
@@ -392,7 +392,7 @@ The package ships a self-contained `<react-jq-cloud>` custom element with React 
 
 <!-- Or via a plain script tag (exposes window.ReactJQCloudWC).
      Pin a version, and consider adding an integrity hash in production. -->
-<script src="https://unpkg.com/@basone01/react-jq-cloud@0.10.0/dist/web-component.global.js"></script>
+<script src="https://unpkg.com/@basone01/react-jq-cloud@0.10.1/dist/web-component.global.js"></script>
 
 <react-jq-cloud
   height="400"
@@ -404,7 +404,7 @@ The package ships a self-contained `<react-jq-cloud>` custom element with React 
 Configuration mirrors the React props:
 
 - **Attributes** (kebab-case strings): `words` (JSON), `width` (number or CSS length, default `100%`), `height` (number, default `400`), `shape`, `spacing`, `font-sizes` (`"12,60"`), `colors` (JSON or comma-separated), `font-family`, `shrink-to-fit`, `remove-overflowing`, `wrap-at-percent`, `ellipsis-at-percent`, `wrap-at-percent-on-limit`, `ellipsis-at-percent-on-limit`, `word-delay`.
-- **Properties** for rich values (take precedence over attributes): `words`, `colors`, `fontSizes`, `renderText`, `renderTooltip`.
+- **Properties** for rich values (take precedence over attributes): `words`, `colors`, `fontSizes`, `renderText`, `renderTooltip`. The function properties should return plain values (strings/numbers) — the embedded runtime is Preact, so JSX created by a host React app is not supported. If your app uses React, use the `ReactJQCloud` component directly instead.
 - **Events** (bubbling `CustomEvent`s): `word-click` (`detail.word`), `word-reveal` (`detail.revealed`, `detail.total`), `cloud-render`.
 
 ```js

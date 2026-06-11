@@ -1340,7 +1340,7 @@ const WC_SNIPPETS: Record<string, string> = {
   import '@basone01/react-jq-cloud/web-component';
 </script>
 
-<!-- Or a plain script tag — no build step, React bundled in.
+<!-- Or a plain script tag — no build step, runtime bundled in (~11 KB gzip).
      In production, pin a version and add an integrity hash. -->
 <script src="https://unpkg.com/@basone01/react-jq-cloud/dist/web-component.global.js"></script>
 
@@ -1733,7 +1733,7 @@ const DEMOS: { key: DemoKey; label: string; words: Word[]; description: string }
   { key: 'spacing',    label: 'Spacing',           words: [],           description: '50 words — drag the slider to add breathing room between words via the spacing prop.' },
   { key: 'overflow',    label: 'Wrap / Ellipsis',   words: [],           description: 'wrapAtPercent and ellipsisAtPercent props: constrain long words to a max percentage of the container width.' },
   { key: 'colors',     label: 'Custom colors',     words: [],           description: 'colors prop: supply a 10-element palette mapped to weight classes w1–w10. Switch between preset palettes.' },
-  { key: 'web-component', label: 'Web component',  words: [],           description: 'The <react-jq-cloud> custom element — framework-agnostic, configured via attributes, with CustomEvent callbacks. React is bundled in.' },
+  { key: 'web-component', label: 'Web component',  words: [],           description: 'The <react-jq-cloud> custom element — framework-agnostic, configured via attributes, with CustomEvent callbacks. A lightweight runtime (preact/compat, ~11 KB gzip) is bundled in.' },
   { key: 'playground', label: '🛝 Playground',      words: [],           description: 'Live playground — toggle every prop and switch datasets (incl. Thai). Generates code as you go.' },
 ];
 

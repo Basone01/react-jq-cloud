@@ -1,6 +1,6 @@
 {
   "name": "@basone01/react-jq-cloud",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "React word cloud component based on jQCloud layout algorithm",
   "repository": "https://github.com/Basone01/react-jq-cloud",
   "publishConfig": {
@@ -51,11 +51,13 @@
   "devDependencies": {
     "@testing-library/jest-dom": "^6.4.0",
     "@testing-library/react": "^16.0.0",
+    "@types/node": "^25.9.3",
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.0",
     "@vitest/coverage-v8": "^2.1.9",
     "jsdom": "^25.0.0",
+    "preact": "^10.29.2",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
     "tsup": "^8.3.0",

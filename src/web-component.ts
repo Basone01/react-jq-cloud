@@ -7,8 +7,11 @@ import type { Word, ReactJQCloudProps } from "./types";
  * Framework-agnostic `<react-jq-cloud>` custom element.
  *
  * Wraps the React component behind a standard Web Component interface so the
- * cloud can be used from plain HTML, Vue, Svelte, Angular, etc. React is
- * bundled into the `web-component` build — the host page needs no framework.
+ * cloud can be used from plain HTML, Vue, Svelte, Angular, etc. The
+ * `web-component` build aliases React to preact/compat and bundles it
+ * (~29 KB min) — the host page needs no framework. Because the embedded
+ * runtime is Preact, the `renderText` / `renderTooltip` properties should
+ * return plain values (strings/numbers), not React JSX from a host app.
  *
  * Configuration:
  * - Attributes (kebab-case, strings): `words` (JSON), `width`, `height`,
