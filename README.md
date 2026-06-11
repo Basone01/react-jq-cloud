@@ -29,6 +29,7 @@ Words are placed on a spiral (elliptic or rectangular) starting from the center 
   - [Embedding HTML in words](#embedding-html-in-words)
   - [Fluid / responsive width](#fluid--responsive-width)
   - [Async data loading pattern](#async-data-loading-pattern)
+- [Web component (no React required)](#web-component-no-react-required)
 - [Credits](#credits)
 - [Contributing](#contributing)
 
@@ -376,6 +377,45 @@ function MyCloud() {
   );
 }
 ```
+
+---
+
+## Web component (no React required)
+
+The package ships a self-contained `<react-jq-cloud>` custom element with React bundled in, so the cloud can be used from plain HTML or any framework (Vue, Svelte, Angular, …).
+
+```html
+<!-- Via a bundler -->
+<script type="module">
+  import '@basone01/react-jq-cloud/web-component';
+</script>
+
+<!-- Or via a plain script tag (exposes window.ReactJQCloudWC).
+     Pin a version, and consider adding an integrity hash in production. -->
+<script src="https://unpkg.com/@basone01/react-jq-cloud@0.9.4/dist/web-component.global.js"></script>
+
+<react-jq-cloud
+  height="400"
+  shrink-to-fit
+  words='[{"text":"React","weight":10},{"text":"TypeScript","weight":8}]'
+></react-jq-cloud>
+```
+
+Configuration mirrors the React props:
+
+- **Attributes** (kebab-case strings): `words` (JSON), `width` (number or CSS length, default `100%`), `height` (number, default `400`), `shape`, `spacing`, `font-sizes` (`"12,60"`), `colors` (JSON or comma-separated), `font-family`, `shrink-to-fit`, `remove-overflowing`, `wrap-at-percent`, `ellipsis-at-percent`, `wrap-at-percent-on-limit`, `ellipsis-at-percent-on-limit`, `word-delay`.
+- **Properties** for rich values (take precedence over attributes): `words`, `colors`, `fontSizes`, `renderText`, `renderTooltip`.
+- **Events** (bubbling `CustomEvent`s): `word-click` (`detail.word`), `word-reveal` (`detail.revealed`, `detail.total`), `cloud-render`.
+
+```js
+const cloud = document.querySelector('react-jq-cloud');
+cloud.words = await fetchWords();            // property assignment re-renders
+cloud.addEventListener('word-click', (e) => {
+  console.log('clicked', e.detail.word.text);
+});
+```
+
+The default theme (the `w1`–`w10` colors from `styles.css`) is injected automatically; page CSS loaded later can override it. The element renders in light DOM — there is no shadow root. This entry point is browser-only; do not import it during SSR. To register under a different tag name, import `defineReactJQCloud` and call it with your tag before the element is used.
 
 ---
 

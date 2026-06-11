@@ -1,6 +1,6 @@
 {
   "name": "@basone01/react-jq-cloud",
-  "version": "0.9.3",
+  "version": "0.9.4",
   "description": "React word cloud component based on jQCloud layout algorithm",
   "repository": "https://github.com/Basone01/react-jq-cloud",
   "publishConfig": {
@@ -23,7 +23,12 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
-    "./styles.css": "./dist/styles.css"
+    "./styles.css": "./dist/styles.css",
+    "./web-component": {
+      "types": "./dist/web-component.d.ts",
+      "import": "./dist/web-component.js",
+      "default": "./dist/web-component.js"
+    }
   },
   "files": [
     "dist"
